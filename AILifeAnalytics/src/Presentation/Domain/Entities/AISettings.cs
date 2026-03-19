@@ -3,7 +3,7 @@
 public class AISettings
 {
     /// <summary>
-    /// Имя активного провайдера: "OpenAI" | "DeepSeek"...
+    /// Имя активного провайдера: "OpenAI" | "DeepSeek" | "HuggingFace" | "GoogleAI"...
     /// </summary>
     public string ActiveProvider { get; set; } = "OpenAI";
 
@@ -13,6 +13,8 @@ public class AISettings
     public Dictionary<string, string> ApiKeys { get; set; } = new()
     {
         ["OpenAI"] = "",
-        ["DeepSeek"] = ""
+        ["DeepSeek"] = "",
+        ["HuggingFace"] = "",
+        ["GoogleAI"] = ""
     };
 }

@@ -539,6 +539,8 @@ function providerKeyHint(name) {
     const hints = {
         OpenAI: 'platform.openai.com → API Keys → Create new secret key',
         DeepSeek: 'platform.deepseek.com → API Keys → Create API Key',
+        HuggingFace: 'huggingface.co → Settings → Access Tokens',
+        GoogleAI: 'studio.google.com → API & Services → Create Key'
     };
     return hints[name] ?? 'Получите ключ на официальном сайте провайдера';
 }

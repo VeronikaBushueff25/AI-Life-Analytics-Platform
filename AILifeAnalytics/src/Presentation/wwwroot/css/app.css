@@ -153,7 +153,6 @@ body {
   margin-left: var(--sidebar-w);
   flex: 1;
   padding: 36px 40px;
-  max-width: 1200px;
 }
 
 .page { display: none; animation: fadeIn 0.25s ease; }
@@ -625,8 +624,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Settings */
 .settings-card {
-    max-width: 640px;
-    padding: 0; /* убираем padding у card, управляем через blocks */
+    max-width: 100%;
+    padding: 0;
     overflow: hidden;
 }
 

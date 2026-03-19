@@ -20,12 +20,20 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSingleton<IActivityRepository, ActivityRepository>();
 builder.Services.AddSingleton<IInsightRepository, InsightRepository>();
 builder.Services.AddSingleton<ISettingsRepository, SettingsRepository>();
+
 builder.Services.AddScoped<IMetricsService, MetricsService>();
 builder.Services.AddScoped<ActivityService>();
+
 builder.Services.AddHttpClient("OpenAI");
 builder.Services.AddHttpClient("DeepSeek");
+builder.Services.AddHttpClient("HuggingFace");
+builder.Services.AddHttpClient("GoogleAI");
+
 builder.Services.AddScoped<IAIProvider, OpenAIProvider>();
 builder.Services.AddScoped<IAIProvider, DeepSeekProvider>();
+builder.Services.AddScoped<IAIProvider, HuggingFaceProvider>();
+builder.Services.AddScoped<IAIProvider, GoogleAIProvide>();
+
 builder.Services.AddScoped<IAIService, AIProviderFactory>();
 
 builder.Services.AddCors(options =>

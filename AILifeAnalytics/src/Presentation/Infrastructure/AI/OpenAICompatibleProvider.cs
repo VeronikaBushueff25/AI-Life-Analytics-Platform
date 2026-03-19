@@ -7,7 +7,7 @@ using AILifeAnalytics.Domain.Interfaces;
 namespace AILifeAnalytics.Infrastructure.AI;
 
 /// <summary>
-/// Базовый класс для OpenAI-совместимых API (OpenAI, DeepSeek...).
+/// Базовый класс для OpenAI-совместимых API 
 /// Провайдер переопределяет BaseUrl, ModelName и способ получения ключа
 /// </summary>
 public abstract class OpenAICompatibleProvider : IAIProvider
@@ -179,16 +179,4 @@ public abstract class OpenAICompatibleProvider : IAIProvider
             return $"Не удалось обработать ошибку {ProviderName}. Попробуйте позже.";
         }
     }
-}
-public class OpenAIProvider : OpenAICompatibleProvider
-{
-    public override string ProviderName => "OpenAI";
-    protected override string BaseUrl => "https://api.openai.com/v1/chat/completions";
-    protected override string ModelName => "gpt-4o-mini";
-
-    public OpenAIProvider(
-        IHttpClientFactory factory,
-        ISettingsRepository settings,
-        ILogger<OpenAIProvider> logger)
-        : base(factory, settings, logger) { }
 }
