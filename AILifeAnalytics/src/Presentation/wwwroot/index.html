@@ -253,7 +253,7 @@
         <div class="form-card settings-card">
 
             <div class="settings-block">
-                <label class="form-group-label">Активный AI-провайдер</label>
+                <h3 class="settings-section-title">Активный AI-провайдер</h3>
                 <p class="settings-section-desc">
                     Все запросы на анализ будут отправляться выбранному провайдеру.
                 </p>
@@ -271,6 +271,68 @@
                 </p>
                 <div id="keys-list" class="keys-list">
                     <!-- генерируется JS -->
+                </div>
+            </div>
+
+            <hr class="settings-divider" />
+
+            <div class="settings-block">
+                <div class="proxy-header">
+                    <div>
+                        <h3 class="settings-section-title">HTTP-прокси</h3>
+                        <p class="settings-section-desc">
+                            Используйте если AI-провайдер недоступен в вашем регионе.
+                            Поддерживаются HTTP и SOCKS5 прокси.
+                        </p>
+                    </div>
+                    <!-- Тогл включения -->
+                    <label class="proxy-toggle-wrap">
+                        <input type="checkbox" id="proxy-enabled" onchange="toggleProxyFields(this.checked)" />
+                        <span class="proxy-toggle-track">
+                            <span class="proxy-toggle-thumb"></span>
+                        </span>
+                        <span class="proxy-toggle-label" id="proxy-toggle-label">Выключен</span>
+                    </label>
+                </div>
+
+                <div id="proxy-fields" class="proxy-fields" style="display:none">
+                    <div class="proxy-row">
+                        <div class="form-group" style="flex:1">
+                            <label class="form-group-label">Хост</label>
+                            <input type="text" id="proxy-host"
+                                   placeholder="127.0.0.1 или proxy.example.com" />
+                        </div>
+                        <div class="form-group proxy-port-group">
+                            <label class="form-group-label">Порт</label>
+                            <input type="number" id="proxy-port" placeholder="1080" min="1" max="65535" value="1080" />
+                        </div>
+                    </div>
+
+                    <div class="proxy-row">
+                        <div class="form-group" style="flex:1">
+                            <label class="form-group-label">
+                                Логин <span style="color:var(--text3);font-weight:400">(если требуется)</span>
+                            </label>
+                            <input type="text" id="proxy-username" placeholder="username" autocomplete="off" />
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label class="form-group-label">
+                                Пароль <span style="color:var(--text3);font-weight:400">(если требуется)</span>
+                            </label>
+                            <div class="key-input-wrap">
+                                <input type="password" id="proxy-password" placeholder="password" autocomplete="off" />
+                                <button class="key-toggle-btn" type="button" onclick="toggleKeyVisibility('proxy-password', this)">
+                                    👁
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-ghost proxy-test-btn"
+                            onclick="testProxy()" id="test-proxy-btn">
+                        ⟳ Проверить соединение
+                    </button>
+                    <span id="proxy-test-result" class="proxy-test-result"></span>
                 </div>
             </div>
 

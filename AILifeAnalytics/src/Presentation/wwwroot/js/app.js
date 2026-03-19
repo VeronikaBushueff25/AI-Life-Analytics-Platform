@@ -579,6 +579,118 @@ async function saveSettings() {
     }
 }
 
+// Settings: прокси
+
+function toggleProxyFields(enabled) {
+    document.getElementById('proxy-fields').style.display = enabled ? 'block' : 'none';
+    document.getElementById('proxy-toggle-label').textContent =
+        enabled ? 'Включён' : 'Выключен';
+}
+
+function fillProxyFields(proxy) {
+    const enabled = proxy?.enabled ?? false;
+    document.getElementById('proxy-enabled').checked = enabled;
+    document.getElementById('proxy-host').value = proxy?.host ?? '';
+    document.getElementById('proxy-port').value = proxy?.port ?? 1080;
+    document.getElementById('proxy-username').value = proxy?.username ?? '';
+    document.getElementById('proxy-password').value = '';  
+    toggleProxyFields(enabled);
+}
+
+function getProxyFromForm() {
+    return {
+        enabled: document.getElementById('proxy-enabled').checked,
+        host: document.getElementById('proxy-host').value.trim(),
+        port: parseInt(document.getElementById('proxy-port').value) || 1080,
+        username: document.getElementById('proxy-username').value.trim(),
+        password: document.getElementById('proxy-password').value
+    };
+}
+
+async function testProxy() {
+    const btn = document.getElementById('test-proxy-btn');
+    const result = document.getElementById('proxy-test-result');
+    btn.disabled = true;
+    btn.textContent = '⟳ Проверяю...';
+    result.className = 'proxy-test-result';
+    result.textContent = '';
+
+    // Сначала сохраняем текущие данные прокси чтобы бэкенд мог проверить
+    await apiFetch('/settings', {
+        method: 'POST',
+        body: JSON.stringify({
+            activeProvider: settingsState.activeProvider,
+            apiKeys: {},
+            proxy: getProxyFromForm()
+        })
+    });
+
+    const { ok, data, error } = await apiFetch('/settings/test-proxy', { method: 'POST' });
+
+    btn.disabled = false;
+    btn.textContent = '⟳ Проверить соединение';
+
+    if (ok) {
+        result.className = 'proxy-test-result success';
+        result.textContent = data;
+    } else {
+        result.className = 'proxy-test-result error';
+        result.textContent = error || 'Ошибка проверки';
+    }
+}
+
+// Обновляем loadSettings чтобы загружать прокси
+async function loadSettings() {
+    if (currentPage !== 'settings') return;
+
+    const { ok, data } = await apiFetch('/settings/providers');
+    if (!ok) { toast('Не удалось загрузить настройки', 'error'); return; }
+
+    settingsState.providers = data.providers;
+    settingsState.activeProvider = data.providers.find(p => p.isActive)?.name ?? 'OpenAI';
+    settingsState.keys = {};
+
+    renderProviderList();
+    renderKeysList();
+    fillProxyFields(data.proxy);  
+}
+
+// Обновляем saveSettings чтобы отправлять прокси
+async function saveSettings() {
+    const btn = document.querySelector('#page-settings .btn-primary');
+    const statusEl = document.getElementById('settings-status');
+    btn.disabled = true;
+    btn.textContent = 'Сохранение...';
+    statusEl.className = 'settings-status-line';
+    statusEl.textContent = '';
+
+    const payload = {
+        activeProvider: settingsState.activeProvider,
+        apiKeys: settingsState.keys,
+        proxy: getProxyFromForm()   // <-- добавляем прокси
+    };
+
+    const { ok, error } = await apiFetch('/settings', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Сохранить настройки';
+
+    if (ok) {
+        toast(`Сохранено. Активен: ${settingsState.activeProvider}`, 'success');
+        statusEl.className = 'settings-status-line saved';
+        statusEl.textContent = `✓ Сохранено в ${new Date().toLocaleTimeString('ru-RU')}`;
+        settingsState.keys = {};
+        await loadSettings();
+    } else {
+        statusEl.className = 'settings-status-line error';
+        statusEl.textContent = `✗ ${error || 'Ошибка сохранения'}`;
+        toast(error || 'Ошибка сохранения', 'error');
+    }
+}
+
 // Init 
 document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();

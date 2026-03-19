@@ -1,4 +1,6 @@
-﻿namespace AILifeAnalytics.Domain.Entities;
+﻿using AILifeAnalytics.Application.DTOs;
+
+namespace AILifeAnalytics.Domain.Entities;
 
 public class AISettings
 {
@@ -6,6 +8,11 @@ public class AISettings
     /// Имя активного провайдера: "OpenAI" | "DeepSeek" | "HuggingFace" | "GoogleAI"...
     /// </summary>
     public string ActiveProvider { get; set; } = "OpenAI";
+
+    /// <summary>
+    /// Настройки прокси. Если Enabled = false — прокси не используется.
+    /// </summary>
+    public ProxySettings Proxy { get; set; } = new();
 
     /// <summary>
     /// Словарь ключей: ProviderName → ApiKey

@@ -115,3 +115,32 @@ public class SaveSettingsRequest
     public string ActiveProvider { get; set; } = "OpenAI";
     public Dictionary<string, string> ApiKeys { get; set; } = new();
 }
+
+public class ProxySettings
+{
+    public bool Enabled { get; set; } = false;
+    public string Host { get; set; } = "";  
+    public int Port { get; set; } = 1080; 
+    public string Username { get; set; } = "";   // опционально
+    public string Password { get; set; } = "";   // опционально
+
+    /// <summary>
+    /// Собрать Uri для WebProxy
+    /// </summary>
+    public string ToUrl() => $"http://{Host}:{Port}";
+}
+
+public class ProxySettingsDto
+{
+    public bool Enabled { get; set; } = false;
+    public string Host { get; set; } = "";
+    public int Port { get; set; } = 1080;
+    public string Username { get; set; } = "";
+    public string Password { get; set; } = "";
+}
+
+public class SettingsResponse
+{
+    public IEnumerable<ProviderInfo> Providers { get; set; } = [];
+    public ProxySettingsDto Proxy { get; set; } = new();
+}

@@ -1,8 +1,9 @@
+using AILifeAnalytics.Application.DTOs;
+using AILifeAnalytics.Domain.Entities;
+using AILifeAnalytics.Domain.Interfaces;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using AILifeAnalytics.Domain.Entities;
-using AILifeAnalytics.Domain.Interfaces;
 
 namespace AILifeAnalytics.Infrastructure.AI;
 
@@ -129,15 +130,16 @@ public abstract class OpenAICompatibleProvider : IAIProvider
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var client = HttpClientFactory.CreateClient(ProviderName);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            var httpClient = BuildHttpClient(settings.Proxy);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
-            var response = await client.PostAsync(BaseUrl, content);
+            var response = await httpClient.PostAsync(BaseUrl, content);
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                Logger.LogError("{Provider} API error: {Status} - {Body}", ProviderName, response.StatusCode, responseBody);
+                Logger.LogError("{Provider} API error: {Status} - {Body}",
+                    ProviderName, response.StatusCode, responseBody);
                 return HandleError(responseBody);
             }
 
@@ -151,8 +153,39 @@ public abstract class OpenAICompatibleProvider : IAIProvider
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to call {Provider} API", ProviderName);
-            return $"Ошибка при обращении к {ProviderName}. Проверьте соединение.";
+            return $"Ошибка при обращении к {ProviderName}. Проверьте соединение и настройки прокси.";
         }
+    }
+
+    /// <summary>
+    /// Создаёт HttpClient напрямую (с прокси или без).
+    /// Не используем IHttpClientFactory здесь — фабрика не поддерживает
+    /// динамическую смену прокси без пересоздания handler.
+    /// </summary>
+    private HttpClient BuildHttpClient(ProxySettings proxy)
+    {
+        if (!proxy.Enabled || string.IsNullOrWhiteSpace(proxy.Host))
+        {
+            return HttpClientFactory.CreateClient(ProviderName);
+        }
+
+        var webProxy = new System.Net.WebProxy(proxy.ToUrl(), false);
+
+        if (!string.IsNullOrWhiteSpace(proxy.Username))
+        {
+            webProxy.Credentials = new System.Net.NetworkCredential(
+                proxy.Username, proxy.Password);
+        }
+
+        var handler = new HttpClientHandler
+        {
+            Proxy = webProxy,
+            UseProxy = true,
+            // Отключаем проверку SSL-сертификата прокси если нужно
+            // ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+
+        return new HttpClient(handler);
     }
 
     private string HandleError(string responseBody)

@@ -28,16 +28,17 @@
 }
 
 body.light {
-  --bg: #f0eff8;
-  --surface: #ffffff;
-  --surface2: #f5f4fc;
-  --surface3: #eceaf6;
-  --border: rgba(0,0,0,0.08);
-  --border-hover: rgba(0,0,0,0.15);
-  --text: #1a1a2e;
-  --text2: #555570;
-  --text3: #9090a8;
-  --accent-glow: rgba(124,111,255,0.12);
+    --bg: #f0eff8;
+    --surface: #ffffff;
+    --surface2: #f5f4fc;
+    --surface3: #eceaf6;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.15);
+    --text: #1a1a2e;
+    --text2: #555570;
+    --text3: #9090a8;
+    --accent-glow: rgba(124,111,255,0.12);
+    --green: #00ad09;
 }
 
 /* Reset */
@@ -872,6 +873,125 @@ code {
     padding: 1px 6px;
     color: var(--accent);
 }
+
+/* Proxy section */
+.proxy-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.proxy-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+    .proxy-toggle-wrap input[type="checkbox"] {
+        display: none;
+    }
+
+.proxy-toggle-track {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.proxy-toggle-wrap input:checked + .proxy-toggle-track {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.proxy-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.proxy-toggle-wrap input:checked + .proxy-toggle-track .proxy-toggle-thumb {
+    transform: translateX(16px);
+}
+
+.proxy-toggle-label {
+    font-size: 12px;
+    color: var(--text2);
+    min-width: 52px;
+}
+
+.proxy-fields {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.proxy-row {
+    margin-top: 15px;
+    display: flex;
+    gap: 14px;
+}
+
+.proxy-port-group {
+    width: 110px;
+    flex-shrink: 0;
+}
+
+/* Общий стиль для всех text/number инпутов в настройках */
+#page-settings input[type="text"],
+#page-settings input[type="number"],
+#page-settings input[type="password"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    width: 100%;
+    transition: var(--transition);
+}
+
+#page-settings input:focus {
+    outline: none;
+    border-color: rgba(124, 111, 255, 0.5);
+    background: var(--surface3);
+}
+
+.proxy-test-btn {
+    margin-top: 15px;
+    align-self: flex-start;
+    font-size: 13px;
+    padding: 8px 14px;
+}
+
+.proxy-test-result {
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 6px 0;
+    display: block;
+}
+
+    .proxy-test-result.success {
+        color: var(--green);
+    }
+
+    .proxy-test-result.error {
+        color: var(--red);
+    }
 
 /* Toast */
 .toast {
