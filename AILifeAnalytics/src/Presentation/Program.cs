@@ -13,22 +13,24 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "AI Life Analytics API",
         Version = "v1",
-        Description = "Behavioral analytics platform with AI-powered insights"
+        Description = "Behavioral analytics platform with pluggable AI providers"
     });
 });
 
 builder.Services.AddSingleton<IActivityRepository, ActivityRepository>();
 builder.Services.AddSingleton<IInsightRepository, InsightRepository>();
+builder.Services.AddSingleton<ISettingsRepository, SettingsRepository>();
 builder.Services.AddScoped<IMetricsService, MetricsService>();
 builder.Services.AddScoped<ActivityService>();
 builder.Services.AddHttpClient("OpenAI");
-builder.Services.AddScoped<IAIService, OpenAIService>();
+builder.Services.AddHttpClient("DeepSeek");
+builder.Services.AddScoped<IAIProvider, OpenAIProvider>();
+builder.Services.AddScoped<IAIProvider, DeepSeekProvider>();
+builder.Services.AddScoped<IAIService, AIProviderFactory>();
 
 builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-});
+    options.AddDefaultPolicy(p =>
+        p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 builder.Logging.AddConsole();
 
@@ -44,7 +46,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseStaticFiles();  
+app.UseStaticFiles();
 app.UseCors();
 app.UseRouting();
 app.MapControllers();

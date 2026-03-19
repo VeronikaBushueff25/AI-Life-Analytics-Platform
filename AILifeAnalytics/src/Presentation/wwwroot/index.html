@@ -19,22 +19,26 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
-      <span class="nav-icon">◈</span>
-      <span>Дашборд</span>
-    </a>
-    <a class="nav-item" data-page="entry" onclick="navigate('entry')">
-      <span class="nav-icon">✦</span>
-      <span>Добавить запись</span>
-    </a>
-    <a class="nav-item" data-page="insights" onclick="navigate('insights')">
-      <span class="nav-icon">◉</span>
-      <span>AI Инсайты</span>
-    </a>
-    <a class="nav-item" data-page="history" onclick="navigate('history')">
-      <span class="nav-icon">≡</span>
-      <span>История</span>
-    </a>
+      <a class="nav-item" data-page="settings" onclick="navigate('settings')">
+          <span class="nav-icon">⚙</span>
+          <span>Настройки</span>
+      </a>
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+          <span class="nav-icon">◈</span>
+          <span>Дашборд</span>
+      </a>
+      <a class="nav-item" data-page="entry" onclick="navigate('entry')">
+          <span class="nav-icon">✦</span>
+          <span>Добавить запись</span>
+      </a>
+      <a class="nav-item" data-page="insights" onclick="navigate('insights')">
+          <span class="nav-icon">◉</span>
+          <span>AI Инсайты</span>
+      </a>
+      <a class="nav-item" data-page="history" onclick="navigate('history')">
+          <span class="nav-icon">≡</span>
+          <span>История</span>
+      </a>
   </nav>
 
   <div class="sidebar-footer">
@@ -48,194 +52,238 @@
 <!-- ── Main Content ─────────────────────────────────────────── -->
 <main class="main">
 
-  <!-- Dashboard Page -->
-  <section id="page-dashboard" class="page active">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Дашборд</h1>
-        <p class="page-subtitle" id="dashboard-date">Загрузка...</p>
-      </div>
-      <button class="btn btn-primary" onclick="navigate('entry')">+ Новая запись</button>
-    </div>
-
-    <!-- KPI Cards -->
-    <div class="kpi-grid" id="kpi-grid">
-      <div class="kpi-card skeleton"></div>
-      <div class="kpi-card skeleton"></div>
-      <div class="kpi-card skeleton"></div>
-      <div class="kpi-card skeleton"></div>
-      <div class="kpi-card skeleton"></div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="charts-row">
-      <div class="chart-card large">
-        <div class="chart-header">
-          <h3>Продуктивность</h3>
-          <div class="chart-tabs">
-            <button class="chart-tab active" onclick="switchChart('productivity')">Продуктивность</button>
-            <button class="chart-tab" onclick="switchChart('mood')">Настроение</button>
-            <button class="chart-tab" onclick="switchChart('sleep')">Сон</button>
-          </div>
-        </div>
-        <div style="position:relative;height:220px">
-          <canvas id="main-chart"></canvas>
-        </div>
-      </div>
-
-      <div class="chart-card small">
-        <div class="chart-header">
-          <h3>Время</h3>
-        </div>
-        <div style="position:relative;height:160px">
-          <canvas id="time-chart"></canvas>
-        </div>
-        <div id="time-legend" class="time-legend"></div>
-      </div>
-    </div>
-
-    <!-- AI Insight Box -->
-    <div class="ai-card" id="ai-card">
-      <div class="ai-header">
-        <div class="ai-badge">AI</div>
-        <h3>Персональный инсайт</h3>
-        <button class="btn btn-ghost" onclick="generateInsight()" id="ai-btn">Обновить анализ</button>
-      </div>
-      <div class="ai-content" id="ai-content">
-        <div class="ai-placeholder">
-          <p>Нажмите «Обновить анализ» для получения персонализированного AI-анализа на основе ваших данных.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Add Entry Page -->
-  <section id="page-entry" class="page">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Новая запись</h1>
-        <p class="page-subtitle">Заполните дневник эффективности</p>
-      </div>
-    </div>
-
-    <div class="form-card">
-      <form id="entry-form" onsubmit="submitEntry(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Дата</label>
-            <input type="date" id="f-date" required />
-          </div>
-        </div>
-
-        <div class="form-row two">
-          <div class="form-group">
-            <label>Часы сна</label>
-            <div class="slider-group">
-              <input type="range" id="f-sleep" min="0" max="12" step="0.5" value="7"
-                     oninput="updateSlider('sleep', this.value)" />
-              <span class="slider-val" id="sleep-val">7.0 ч</span>
+    <!-- Dashboard Page -->
+    <section id="page-dashboard" class="page active">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Дашборд</h1>
+                <p class="page-subtitle" id="dashboard-date">Загрузка...</p>
             </div>
-            <div class="slider-labels"><span>0</span><span>Идеал: 8ч</span><span>12</span></div>
-          </div>
-
-          <div class="form-group">
-            <label>Часы работы</label>
-            <div class="slider-group">
-              <input type="range" id="f-work" min="0" max="16" step="0.5" value="8"
-                     oninput="updateSlider('work', this.value)" />
-              <span class="slider-val" id="work-val">8.0 ч</span>
-            </div>
-            <div class="slider-labels"><span>0</span><span>Норма: 6-8ч</span><span>16</span></div>
-          </div>
+            <button class="btn btn-primary" onclick="navigate('entry')">+ Новая запись</button>
         </div>
 
-        <div class="form-row two">
-          <div class="form-group">
-            <label>Уровень фокуса <span class="label-hint" id="focus-label">5</span></label>
-            <div class="rating-row" id="focus-rating">
-              <!-- generated by JS -->
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Настроение <span class="label-hint" id="mood-label">5</span></label>
-            <div class="rating-row" id="mood-rating">
-              <!-- generated by JS -->
-            </div>
-          </div>
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpi-grid">
+            <div class="kpi-card skeleton"></div>
+            <div class="kpi-card skeleton"></div>
+            <div class="kpi-card skeleton"></div>
+            <div class="kpi-card skeleton"></div>
+            <div class="kpi-card skeleton"></div>
         </div>
 
-        <div class="form-group">
-          <label>Заметки <span class="optional">(необязательно)</span></label>
-          <textarea id="f-notes" rows="3" placeholder="Что повлияло на день? Мысли, события..."></textarea>
-        </div>
-
-        <!-- Live preview -->
-        <div class="preview-card" id="preview-card">
-          <div class="preview-title">Предварительный расчёт</div>
-          <div class="preview-metrics">
-            <div class="preview-metric">
-              <span class="pm-label">Продуктивность</span>
-              <span class="pm-value" id="prev-productivity">—</span>
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <div class="chart-card large">
+                <div class="chart-header">
+                    <h3>Продуктивность</h3>
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" onclick="switchChart('productivity')">Продуктивность</button>
+                        <button class="chart-tab" onclick="switchChart('mood')">Настроение</button>
+                        <button class="chart-tab" onclick="switchChart('sleep')">Сон</button>
+                    </div>
+                </div>
+                <div style="position:relative;height:220px">
+                    <canvas id="main-chart"></canvas>
+                </div>
             </div>
-            <div class="preview-metric">
-              <span class="pm-label">Энергия</span>
-              <span class="pm-value" id="prev-energy">—</span>
+
+            <div class="chart-card small">
+                <div class="chart-header">
+                    <h3>Время</h3>
+                </div>
+                <div style="position:relative;height:160px">
+                    <canvas id="time-chart"></canvas>
+                </div>
+                <div id="time-legend" class="time-legend"></div>
             </div>
-          </div>
         </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn btn-ghost" onclick="navigate('dashboard')">Отмена</button>
-          <button type="submit" class="btn btn-primary" id="submit-btn">Сохранить запись</button>
+        <!-- AI Insight Box -->
+        <div class="ai-card" id="ai-card">
+            <div class="ai-header">
+                <div class="ai-badge">AI</div>
+                <h3>Персональный инсайт</h3>
+                <button class="btn btn-ghost" onclick="generateInsight()" id="ai-btn">Обновить анализ</button>
+            </div>
+            <div class="ai-content" id="ai-content">
+                <div class="ai-placeholder">
+                    <p>Нажмите «Обновить анализ» для получения персонализированного AI-анализа на основе ваших данных.</p>
+                </div>
+            </div>
         </div>
-      </form>
-    </div>
-  </section>
+    </section>
 
-  <!-- Insights Page -->
-  <section id="page-insights" class="page">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">AI Инсайты</h1>
-        <p class="page-subtitle">История анализа и рекомендаций</p>
-      </div>
-      <button class="btn btn-primary" onclick="generatePatterns()">🔍 Анализ паттернов</button>
-    </div>
+    <!-- Add Entry Page -->
+    <section id="page-entry" class="page">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Новая запись</h1>
+                <p class="page-subtitle">Заполните дневник эффективности</p>
+            </div>
+        </div>
 
-    <div class="insights-list" id="insights-list">
-      <div class="loading-state">Загрузка инсайтов...</div>
-    </div>
-  </section>
+        <div class="form-card">
+            <form id="entry-form" onsubmit="submitEntry(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата</label>
+                        <input type="date" id="f-date" required />
+                    </div>
+                </div>
 
-  <!-- History Page -->
-  <section id="page-history" class="page">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">История</h1>
-        <p class="page-subtitle">Все ваши записи</p>
-      </div>
-    </div>
-    <div class="history-table-wrap">
-      <table class="history-table" id="history-table">
-        <thead>
-          <tr>
-            <th>Дата</th>
-            <th>Сон</th>
-            <th>Работа</th>
-            <th>Фокус</th>
-            <th>Настроение</th>
-            <th>Продуктивность</th>
-            <th>Энергия</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="history-body">
-          <tr><td colspan="8" class="table-empty">Загрузка...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+                <div class="form-row two">
+                    <div class="form-group">
+                        <label>Часы сна</label>
+                        <div class="slider-group">
+                            <input type="range" id="f-sleep" min="0" max="12" step="0.5" value="7"
+                                   oninput="updateSlider('sleep', this.value)" />
+                            <span class="slider-val" id="sleep-val">7.0 ч</span>
+                        </div>
+                        <div class="slider-labels"><span>0</span><span>Идеал: 8ч</span><span>12</span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Часы работы</label>
+                        <div class="slider-group">
+                            <input type="range" id="f-work" min="0" max="16" step="0.5" value="8"
+                                   oninput="updateSlider('work', this.value)" />
+                            <span class="slider-val" id="work-val">8.0 ч</span>
+                        </div>
+                        <div class="slider-labels"><span>0</span><span>Норма: 6-8ч</span><span>16</span></div>
+                    </div>
+                </div>
+
+                <div class="form-row two">
+                    <div class="form-group">
+                        <label>Уровень фокуса <span class="label-hint" id="focus-label">5</span></label>
+                        <div class="rating-row" id="focus-rating">
+                            <!-- generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Настроение <span class="label-hint" id="mood-label">5</span></label>
+                        <div class="rating-row" id="mood-rating">
+                            <!-- generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Заметки <span class="optional">(необязательно)</span></label>
+                    <textarea id="f-notes" rows="3" placeholder="Что повлияло на день? Мысли, события..."></textarea>
+                </div>
+
+                <!-- Live preview -->
+                <div class="preview-card" id="preview-card">
+                    <div class="preview-title">Предварительный расчёт</div>
+                    <div class="preview-metrics">
+                        <div class="preview-metric">
+                            <span class="pm-label">Продуктивность</span>
+                            <span class="pm-value" id="prev-productivity">—</span>
+                        </div>
+                        <div class="preview-metric">
+                            <span class="pm-label">Энергия</span>
+                            <span class="pm-value" id="prev-energy">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-ghost" onclick="navigate('dashboard')">Отмена</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Сохранить запись</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Insights Page -->
+    <section id="page-insights" class="page">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">AI Инсайты</h1>
+                <p class="page-subtitle">История анализа и рекомендаций</p>
+            </div>
+            <button class="btn btn-primary" onclick="generatePatterns()">🔍 Анализ паттернов</button>
+        </div>
+
+        <div class="insights-list" id="insights-list">
+            <div class="loading-state">Загрузка инсайтов...</div>
+        </div>
+    </section>
+
+    <!-- History Page -->
+    <section id="page-history" class="page">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">История</h1>
+                <p class="page-subtitle">Все ваши записи</p>
+            </div>
+        </div>
+        <div class="history-table-wrap">
+            <table class="history-table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сон</th>
+                        <th>Работа</th>
+                        <th>Фокус</th>
+                        <th>Настроение</th>
+                        <th>Продуктивность</th>
+                        <th>Энергия</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr><td colspan="8" class="table-empty">Загрузка...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Settings Page -->
+    <section id="page-settings" class="page">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Настройки</h1>
+                <p class="page-subtitle">AI-провайдеры и API-ключи</p>
+            </div>
+        </div>
+
+        <div class="form-card settings-card">
+
+            <div class="settings-block">
+                <label class="form-group-label">Активный AI-провайдер</label>
+                <p class="settings-section-desc">
+                    Все запросы на анализ будут отправляться выбранному провайдеру.
+                </p>
+                <div id="provider-list" class="provider-list">
+                    <!-- генерируется JS -->
+                </div>
+            </div>
+
+            <hr class="settings-divider" />
+
+            <div class="settings-block">
+                <h3 class="settings-section-title">API-ключи</h3>
+                <p class="settings-section-desc">
+                    Ключи хранятся локально в <code>data/settings.json</code>. Никуда не отправляются.
+                </p>
+                <div id="keys-list" class="keys-list">
+                    <!-- генерируется JS -->
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <div class="form-actions">
+                    <button type="button" class="btn btn-ghost" onclick="loadSettings()">Сбросить</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Сохранить настройки</button>
+                </div>
+                <div id="settings-status" class="settings-status-line"></div>
+            </div>
+
+        </div>
+    </section>
 
 </main>
 

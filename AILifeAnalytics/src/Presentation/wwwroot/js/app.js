@@ -1,4 +1,4 @@
-// ── Config ──────────────────────────────────────────────────
+// Config
 const API = '/api';
 let mainChart = null;
 let timeChart = null;
@@ -8,7 +8,7 @@ let currentPage = 'dashboard';
 // Form state
 let formState = { sleep: 7, work: 8, focus: 5, mood: 5 };
 
-// ── Navigation ───────────────────────────────────────────────
+// Navigation
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -16,13 +16,14 @@ function navigate(page) {
   document.querySelector(`[data-page="${page}"]`).classList.add('active');
   currentPage = page;
 
+  if (page === 'settings') loadSettings();
   if (page === 'dashboard') loadDashboard();
   if (page === 'insights') loadInsights();
   if (page === 'history') loadHistory();
   if (page === 'entry') setupEntryForm();
 }
 
-// ── API Helpers ──────────────────────────────────────────────
+// API Helpers
 async function apiFetch(endpoint, options = {}) {
   try {
     const res = await fetch(API + endpoint, {
@@ -36,7 +37,7 @@ async function apiFetch(endpoint, options = {}) {
   }
 }
 
-// ── Toast ────────────────────────────────────────────────────
+// Toast
 function toast(msg, type = 'info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -44,7 +45,7 @@ function toast(msg, type = 'info') {
   setTimeout(() => el.classList.remove('show'), 3500);
 }
 
-// ── Dashboard ────────────────────────────────────────────────
+// Dashboard
 async function loadDashboard() {
   document.getElementById('dashboard-date').textContent =
     new Date().toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -125,7 +126,7 @@ function scoreLabel(v) {
   return 'Низко';
 }
 
-// ── Charts ───────────────────────────────────────────────────
+// Charts
 function renderMainChart(points, type) {
   if (mainChart) mainChart.destroy();
 
@@ -251,7 +252,7 @@ function renderTimeChart(td) {
     </div>`).join('');
 }
 
-// ── AI Insight ───────────────────────────────────────────────
+// AI Insight
 async function loadLatestInsight() {
   const { ok, data } = await apiFetch('/ai/insights?count=1');
   if (ok && data && data.length > 0) {
@@ -289,7 +290,7 @@ async function generatePatterns() {
   loadInsights();
 }
 
-// ── Insights Page ────────────────────────────────────────────
+// Insights Page
 async function loadInsights() {
   const list = document.getElementById('insights-list');
   list.innerHTML = '<div class="loading-state">Загрузка инсайтов...</div>';
@@ -317,7 +318,7 @@ async function loadInsights() {
     </div>`).join('');
 }
 
-// ── History ──────────────────────────────────────────────────
+// History
 async function loadHistory() {
   const body = document.getElementById('history-body');
   const { ok, data, error } = await apiFetch('/activity');
@@ -352,7 +353,7 @@ async function deleteActivity(id) {
   else toast('Не удалось удалить', 'error');
 }
 
-// ── Entry Form ───────────────────────────────────────────────
+// Entry Form
 function setupEntryForm() {
   // Set today's date
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
@@ -439,7 +440,7 @@ async function submitEntry(e) {
   }
 }
 
-// ── Theme ────────────────────────────────────────────────────
+// Theme
 function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
   document.body.classList.toggle('light', !isDark);
@@ -451,7 +452,7 @@ function toggleTheme() {
   }
 }
 
-// ── Utils ────────────────────────────────────────────────────
+// Utils
 function formatDate(dateStr, short = false) {
   const d = new Date(dateStr);
   if (short) return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -462,7 +463,121 @@ function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// ── Init ─────────────────────────────────────────────────────
+// Settings
+let settingsState = { activeProvider: 'OpenAI', providers: [], keys: {} };
+
+async function loadSettings() {
+    if (currentPage !== 'settings') return;
+
+    const { ok, data } = await apiFetch('/settings/providers');
+    if (!ok) { toast('Не удалось загрузить настройки', 'error'); return; }
+
+    settingsState.providers = data;
+    settingsState.activeProvider = data.find(p => p.isActive)?.name ?? 'OpenAI';
+    settingsState.keys = {};
+
+    renderProviderList();
+    renderKeysList();
+}
+
+function renderProviderList() {
+    const container = document.getElementById('provider-list');
+    container.innerHTML = settingsState.providers.map(p => {
+        const isActive = p.name === settingsState.activeProvider;
+        return `
+      <label class="provider-card ${isActive ? 'active' : ''}">
+        <input type="radio" name="provider" value="${p.name}"
+               ${isActive ? 'checked' : ''}
+               onchange="settingsState.activeProvider = this.value; renderProviderList()"/>
+        <div class="provider-card-info">
+          <div class="provider-card-name">${p.name}</div>
+          <div class="provider-card-status ${p.hasKey ? 'has-key' : 'no-key'}">
+            ${p.hasKey ? '✓ Ключ настроен' : '✗ Ключ не задан'}
+          </div>
+        </div>
+        ${isActive ? '<span class="provider-active-badge">Активен</span>' : ''}
+      </label>`;
+    }).join('');
+}
+
+function renderKeysList() {
+    const container = document.getElementById('keys-list');
+    container.innerHTML = settingsState.providers.map(p => `
+    <div class="form-group">
+      <label>
+        ${p.name} API Key
+        <span class="key-status-dot ${p.hasKey ? 'set' : 'unset'}">
+          ${p.hasKey ? '● настроен' : '○ не задан'}
+        </span>
+      </label>
+      <div class="key-input-wrap">
+        <input
+          type="password"
+          id="key-${p.name}"
+          placeholder="${p.hasKey
+            ? 'оставьте пустым, чтобы не менять'
+            : 'Вставьте ключ...'}"
+          oninput="settingsState.keys['${p.name}'] = this.value"
+          autocomplete="off"
+        />
+        <button class="key-toggle-btn" type="button"
+                onclick="toggleKeyVisibility('key-${p.name}', this)"
+                title="Показать/скрыть">👁</button>
+      </div>
+      <div class="key-hint">${providerKeyHint(p.name)}</div>
+    </div>`).join('');
+}
+
+function toggleKeyVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.style.opacity = isPassword ? '1' : '0.5';
+}
+
+function providerKeyHint(name) {
+    const hints = {
+        OpenAI: 'platform.openai.com → API Keys → Create new secret key',
+        DeepSeek: 'platform.deepseek.com → API Keys → Create API Key',
+    };
+    return hints[name] ?? 'Получите ключ на официальном сайте провайдера';
+}
+
+async function saveSettings() {
+    const btn = document.querySelector('#page-settings .btn-primary');
+    const statusEl = document.getElementById('settings-status');
+    btn.disabled = true;
+    btn.textContent = 'Сохранение...';
+    statusEl.className = 'settings-status-line';
+    statusEl.textContent = '';
+
+    const payload = {
+        activeProvider: settingsState.activeProvider,
+        apiKeys: settingsState.keys
+    };
+
+    const { ok, error } = await apiFetch('/settings', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Сохранить настройки';
+
+    if (ok) {
+        toast(`Сохранено. Активен: ${settingsState.activeProvider}`, 'success');
+        statusEl.className = 'settings-status-line saved';
+        statusEl.textContent = `✓ Сохранено в ${new Date().toLocaleTimeString('ru-RU')}`;
+        settingsState.keys = {};
+        await loadSettings();
+    } else {
+        statusEl.className = 'settings-status-line error';
+        statusEl.textContent = `✗ ${error || 'Ошибка сохранения'}`;
+        toast(error || 'Ошибка сохранения', 'error');
+    }
+}
+
+// Init 
 document.addEventListener('DOMContentLoaded', () => {
   loadDashboard();
 });

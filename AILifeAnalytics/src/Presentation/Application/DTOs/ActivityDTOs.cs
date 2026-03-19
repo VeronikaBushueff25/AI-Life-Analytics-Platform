@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AILifeAnalytics.Application.DTOs;
 
-// --- Requests ---
-
+/// <summary>
+/// Requests
+/// </summary>
 public class CreateActivityRequest
 {
     [Required]
@@ -27,7 +28,9 @@ public class CreateActivityRequest
 
 public class UpdateActivityRequest : CreateActivityRequest { }
 
-// --- Responses ---
+/// <summary>
+/// Responses
+/// </summary>
 
 public class ActivityResponse
 {
@@ -94,4 +97,21 @@ public class ApiResponse<T>
 
     public static ApiResponse<T> Ok(T data) => new() { Success = true, Data = data };
     public static ApiResponse<T> Fail(string error) => new() { Success = false, Error = error };
+}
+
+/// <summary>
+/// DTOs для настроек
+/// </summary>
+
+public class ProviderInfo
+{
+    public string Name { get; set; } = string.Empty;
+    public bool HasKey { get; set; }       
+    public bool IsActive { get; set; }
+}
+
+public class SaveSettingsRequest
+{
+    public string ActiveProvider { get; set; } = "OpenAI";
+    public Dictionary<string, string> ApiKeys { get; set; } = new();
 }

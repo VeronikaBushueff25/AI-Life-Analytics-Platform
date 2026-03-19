@@ -1,0 +1,18 @@
+﻿namespace AILifeAnalytics.Domain.Entities;
+
+public class AISettings
+{
+    /// <summary>
+    /// Имя активного провайдера: "OpenAI" | "DeepSeek"...
+    /// </summary>
+    public string ActiveProvider { get; set; } = "OpenAI";
+
+    /// <summary>
+    /// Словарь ключей: ProviderName → ApiKey
+    /// </summary>
+    public Dictionary<string, string> ApiKeys { get; set; } = new()
+    {
+        ["OpenAI"] = "",
+        ["DeepSeek"] = ""
+    };
+}

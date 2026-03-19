@@ -126,3 +126,43 @@ public class InsightRepository : JsonRepositoryBase<Insight>, IInsightRepository
         return all.OrderByDescending(i => i.CreatedAt).Take(count);
     }
 }
+public class SettingsRepository : ISettingsRepository
+{
+    private readonly string _filePath;
+    private readonly SemaphoreSlim _lock = new(1, 1);
+
+    public SettingsRepository(IConfiguration config)
+    {
+        var dir = config["DataDirectory"] ?? "data";
+        Directory.CreateDirectory(dir);
+        _filePath = Path.Combine(dir, "settings.json");
+
+        if (!File.Exists(_filePath))
+        {
+            var defaults = new AISettings();
+            File.WriteAllText(_filePath, JsonSerializer.Serialize(defaults, new JsonSerializerOptions { WriteIndented = true }));
+        }
+    }
+
+    public async Task<AISettings> GetAsync()
+    {
+        await _lock.WaitAsync();
+        try
+        {
+            var json = await File.ReadAllTextAsync(_filePath);
+            return JsonSerializer.Deserialize<AISettings>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new AISettings();
+        }
+        finally { _lock.Release(); }
+    }
+
+    public async Task SaveAsync(AISettings settings)
+    {
+        await _lock.WaitAsync();
+        try
+        {
+            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(_filePath, json);
+        }
+        finally { _lock.Release(); }
+    }
+}
