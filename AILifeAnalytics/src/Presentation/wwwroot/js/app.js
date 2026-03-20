@@ -43,9 +43,20 @@ async function navigate(page) {
 function toggleTheme() {
     const isDark = document.body.classList.toggle('dark');
     document.body.classList.toggle('light', !isDark);
-    document.getElementById('theme-icon').textContent = isDark ? '☀' : '☾';
-    if (chartData.productivityChart) {
+
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+        icon.textContent = isDark ? '☀' : '☾';
+    }
+
+    const productivityCanvas = document.getElementById('productivityChart');
+    const timeCanvas = document.getElementById('timeChart');
+
+    if (chartData.productivityChart && productivityCanvas) {
         renderMainChart(chartData.productivityChart, 'productivity');
+    }
+
+    if (chartData.timeDistribution && timeCanvas) {
         renderTimeChart(chartData.timeDistribution);
     }
 }
