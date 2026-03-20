@@ -403,7 +403,6 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 32px;
-  max-width: 720px;
 }
 
 .form-row { margin-bottom: 24px; }
@@ -986,11 +985,11 @@ code {
 }
 
     .proxy-test-result.success {
-        color: var(--green);
+        color: var(--green) !important;
     }
 
     .proxy-test-result.error {
-        color: var(--red);
+        color: var(--red) !important;
     }
 
 /* Toast */

@@ -1,0 +1,59 @@
+﻿<section id="page-dashboard" class="page active">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Дашборд</h1>
+            <p class="page-subtitle" id="dashboard-date">Загрузка...</p>
+        </div>
+        <button class="btn btn-primary" onclick="navigate('entry')">+ Новая запись</button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+        <div class="kpi-card skeleton"></div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <div class="chart-card large">
+            <div class="chart-header">
+                <h3>Продуктивность</h3>
+                <div class="chart-tabs">
+                    <button class="chart-tab active" onclick="switchChart('productivity')">Продуктивность</button>
+                    <button class="chart-tab" onclick="switchChart('mood')">Настроение</button>
+                    <button class="chart-tab" onclick="switchChart('sleep')">Сон</button>
+                </div>
+            </div>
+            <div style="position:relative;height:220px">
+                <canvas id="main-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card small">
+            <div class="chart-header">
+                <h3>Время</h3>
+            </div>
+            <div style="position:relative;height:160px">
+                <canvas id="time-chart"></canvas>
+            </div>
+            <div id="time-legend" class="time-legend"></div>
+        </div>
+    </div>
+
+    <!-- AI Insight Box -->
+    <div class="ai-card" id="ai-card">
+        <div class="ai-header">
+            <div class="ai-badge">AI</div>
+            <h3>Персональный инсайт</h3>
+            <button class="btn btn-ghost" onclick="generateInsight()" id="ai-btn">Обновить анализ</button>
+        </div>
+        <div class="ai-content" id="ai-content">
+            <div class="ai-placeholder">
+                <p>Нажмите «Обновить анализ» для получения персонализированного AI-анализа на основе ваших данных.</p>
+            </div>
+        </div>
+    </div>
+</section>

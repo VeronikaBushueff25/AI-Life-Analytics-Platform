@@ -122,7 +122,7 @@ namespace AILifeAnalytics.Controllers
             var settings = await _settingsRepo.GetAsync();
 
             if (!settings.Proxy.Enabled || string.IsNullOrWhiteSpace(settings.Proxy.Host))
-                return Ok(ApiResponse<string>.Ok("Прокси отключён."));
+                return Ok(ApiResponse<string>.Ok("ℹ Прокси отключён или хост не задан."));
 
             try
             {
@@ -131,17 +131,44 @@ namespace AILifeAnalytics.Controllers
                 if (!string.IsNullOrWhiteSpace(settings.Proxy.Username))
                     webProxy.Credentials = new System.Net.NetworkCredential(settings.Proxy.Username, settings.Proxy.Password);
 
-                var handler = new HttpClientHandler { Proxy = webProxy, UseProxy = true };
-                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(8) };
+                var handler = new HttpClientHandler
+                {
+                    Proxy = webProxy,
+                    UseProxy = true
+                };
+
+                using var client = new HttpClient(handler)
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
 
                 var resp = await client.GetAsync("https://httpbin.org/ip");
                 var body = await resp.Content.ReadAsStringAsync();
 
-                return Ok(ApiResponse<string>.Ok($"✓ Прокси работает. Внешний IP: {body.Trim()}"));
+                string ip;
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(body);
+                    ip = doc.RootElement.GetProperty("origin").GetString() ?? body;
+                }
+                catch
+                {
+                    ip = body.Trim();
+                }
+
+                return Ok(ApiResponse<string>.Ok($"✓ Прокси работает. Внешний IP: {ip}"));
+            }
+            catch (TaskCanceledException)
+            {
+                return Ok(ApiResponse<string>.Ok("✗ Тайм-аут (10 сек). Прокси не отвечает."));
+            }
+            catch (HttpRequestException ex)
+            {
+                return Ok(ApiResponse<string>.Ok($"✗ Ошибка соединения: {ex.Message}"));
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<string>.Fail($"✗ Прокси недоступен: {ex.Message}"));
+                return Ok(ApiResponse<string>.Ok($"✗ Неожиданная ошибка: {ex.Message}"));
             }
         }
     }

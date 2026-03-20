@@ -5,8 +5,8 @@ namespace AILifeAnalytics.Infrastructure.AI
     public class HuggingFaceProvider : OpenAICompatibleProvider
     {
         public override string ProviderName => "HuggingFace";
-        protected override string BaseUrl => "https://api-inference.huggingface.co/models/your-model";
-        protected override string ModelName => "gpt2-medium";
+        protected override string BaseUrl => "https://router.huggingface.co/v1/chat/completions";
+        protected override string ModelName => "moonshotai/Kimi-K2-Instruct-0905";
 
         public HuggingFaceProvider(
             IHttpClientFactory factory,

@@ -1,0 +1,36 @@
+﻿const API_BASE = '/api';
+
+async function apiFetch(endpoint, options = {}) {
+    try {
+        const res = await fetch(API_BASE + endpoint, {
+            headers: { 'Content-Type': 'application/json', ...options.headers },
+            ...options
+        });
+        const json = await res.json();
+        return { ok: json.success === true, data: json.data, error: json.error, status: res.status };
+    } catch (e) {
+        return { ok: false, error: 'Ошибка сети. Убедитесь, что сервер запущен.' };
+    }
+}
+
+const SettingsApi = {
+    getProviders: () => apiFetch('/settings/providers'),
+    save: (payload) => apiFetch('/settings', { method: 'POST', body: JSON.stringify(payload) }),
+    testProxy: () => apiFetch('/settings/test-proxy', { method: 'POST' }),
+};
+
+const ActivityApi = {
+    getAll: () => apiFetch('/activity'),
+    create: (payload) => apiFetch('/activity', { method: 'POST', body: JSON.stringify(payload) }),
+    delete: (id) => apiFetch(`/activity/${id}`, { method: 'DELETE' }),
+};
+
+const DashboardApi = {
+    get: () => apiFetch('/dashboard'),
+};
+
+const AiApi = {
+    getInsights: (count = 20) => apiFetch(`/ai/insights?count=${count}`),
+    analyze: () => apiFetch('/ai/analyze', { method: 'POST' }),
+    analyzePatterns: () => apiFetch('/ai/patterns', { method: 'POST' }),
+};
