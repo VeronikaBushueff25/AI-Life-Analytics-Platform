@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\Application",
+    "\\src\\Domain",
+    "\\src\\Infrastructure",
+    "\\src\\Presentation"
+  ],
+  "SelectedNode": "\\src\\Infrastructure\\Storage",
+  "PreviewInSolutionExplorer": false
+}

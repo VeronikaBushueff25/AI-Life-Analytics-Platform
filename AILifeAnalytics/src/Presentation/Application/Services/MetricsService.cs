@@ -1,4 +1,5 @@
 using AILifeAnalytics.Domain.Entities;
+using AILifeAnalytics.Domain.Enums;
 using AILifeAnalytics.Domain.Interfaces;
 
 namespace AILifeAnalytics.Application.Services;
@@ -132,10 +133,10 @@ public class MetricsService : IMetricsService
         var burnoutRisk = CalculateBurnoutRisk(recent);
         var burnoutStatus = burnoutRisk switch
         {
-            < 25 => "Low",
-            < 50 => "Medium",
-            < 75 => "High",
-            _ => "Critical"
+            < 25 => BurnoutStatus.Low,
+            < 50 => BurnoutStatus.Medium,
+            < 75 => BurnoutStatus.High,
+            _ => BurnoutStatus.Critical
         };
 
         return new Metrics

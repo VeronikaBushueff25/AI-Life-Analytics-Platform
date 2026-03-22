@@ -63,6 +63,10 @@ function toggleTheme() {
 
 // Init
 
-document.addEventListener('DOMContentLoaded', () => {
-    navigate('dashboard');
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/pages/login.html');
+    const html = await res.text();
+    document.getElementById('auth-overlay').innerHTML = html;
+
+    await checkAuth();
 });

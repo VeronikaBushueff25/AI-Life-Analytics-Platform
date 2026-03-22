@@ -1,5 +1,6 @@
 ﻿using AILifeAnalytics.Application.DTOs;
 using AILifeAnalytics.Domain.Entities;
+using AILifeAnalytics.Domain.Enums;
 using AILifeAnalytics.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,7 +49,7 @@ namespace AILifeAnalytics.Controllers
             {
                 Content = content,
                 Date = DateTime.UtcNow,
-                AnalysisType = "general",
+                AnalysisType = AnalysisType.General,
                 ProductivityScore = metrics.ProductivityScore,
                 BurnoutRisk = metrics.BurnoutRisk
             };
@@ -79,7 +80,7 @@ namespace AILifeAnalytics.Controllers
             {
                 Content = content,
                 Date = DateTime.UtcNow,
-                AnalysisType = "patterns"
+                AnalysisType = AnalysisType.Patterns
             };
 
             var saved = await _insightRepo.CreateAsync(insight);

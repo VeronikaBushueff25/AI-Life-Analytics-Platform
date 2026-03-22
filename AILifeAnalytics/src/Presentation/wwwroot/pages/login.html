@@ -1,0 +1,84 @@
+﻿<div class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-brand">
+            <div class="brand-icon">⟨AI⟩</div>
+            <span class="brand-name">LifeAnalytics</span>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">
+                Войти
+            </button>
+            <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">
+                Регистрация
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form" onsubmit="submitLogin(event)">
+            <div class="form-group">
+                <label class="form-group-label">Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com"
+                       autocomplete="email" required />
+            </div>
+            <div class="form-group">
+                <label class="form-group-label">Пароль</label>
+                <div class="key-input-wrap">
+                    <input type="password" id="login-password" placeholder="••••••••"
+                           autocomplete="current-password" required />
+                    <button class="key-toggle-btn" type="button"
+                            onclick="toggleKeyVisibility('login-password', this)">
+                        👁
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="login-error"></div>
+            <button type="submit" class="btn btn-primary auth-submit" id="login-btn">
+                Войти
+            </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form" style="display:none"
+              onsubmit="submitRegister(event)">
+            <div class="form-group">
+                <label class="form-group-label">Имя</label>
+                <input type="text" id="reg-name" placeholder="Как вас зовут?"
+                       autocomplete="name" required />
+            </div>
+            <div class="form-group">
+                <label class="form-group-label">Email</label>
+                <input type="email" id="reg-email" placeholder="you@example.com"
+                       autocomplete="email" required />
+            </div>
+            <div class="form-group">
+                <label class="form-group-label">Пароль</label>
+                <div class="key-input-wrap">
+                    <input type="password" id="reg-password" placeholder="Минимум 6 символов"
+                           autocomplete="new-password" required minlength="6" />
+                    <button class="key-toggle-btn" type="button"
+                            onclick="toggleKeyVisibility('reg-password', this)">
+                        👁
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-group-label">Повторите пароль</label>
+                <div class="key-input-wrap">
+                    <input type="password" id="reg-password2" placeholder="••••••••"
+                           autocomplete="new-password" required />
+                    <button class="key-toggle-btn" type="button"
+                            onclick="toggleKeyVisibility('reg-password2', this)">
+                        👁
+                    </button>
+                </div>
+            </div>
+            <div class="auth-error" id="register-error"></div>
+            <button type="submit" class="btn btn-primary auth-submit" id="register-btn">
+                Создать аккаунт
+            </button>
+        </form>
+
+    </div>
+</div>

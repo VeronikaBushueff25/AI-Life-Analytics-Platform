@@ -59,3 +59,35 @@ public interface ISettingsRepository
     Task<AISettings> GetAsync();
     Task SaveAsync(AISettings settings);
 }
+
+/// <summary>
+/// User
+/// </summary>
+public interface IUserRepository
+{
+    Task<User?> GetByIdAsync(Guid id);
+    Task<User?> GetByEmailAsync(string email);
+    Task<User> CreateAsync(User user);
+    Task<User> UpdateAsync(User user);
+    Task<bool> ExistsAsync(string email);
+}
+
+/// <summary>
+/// Настройки user
+/// </summary>
+public interface IUserSettingsRepository
+{
+    Task<UserSettings?> GetByUserIdAsync(Guid userId);
+    Task<UserSettings> CreateAsync(UserSettings settings);
+    Task<UserSettings> UpdateAsync(UserSettings settings);
+}
+
+/// <summary>
+/// Аунтефикация
+/// </summary>
+public interface IAuthService
+{
+    Task<AuthResult> RegisterAsync(string email, string password, string name);
+    Task<AuthResult> LoginAsync(string email, string password);
+    Task<User?> GetUserByTokenAsync(string token);
+}

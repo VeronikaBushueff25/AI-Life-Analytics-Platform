@@ -1,5 +1,6 @@
 ﻿using AILifeAnalytics.Application.DTOs;
 using AILifeAnalytics.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AILifeAnalytics.Controllers
@@ -21,6 +22,7 @@ namespace AILifeAnalytics.Controllers
         /// <summary>
         /// Get all activities ordered by date descending
         /// </summary>
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<ActivityResponse>>>> GetAll()
         {

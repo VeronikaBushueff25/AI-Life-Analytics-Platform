@@ -1,3 +1,4 @@
+using AILifeAnalytics.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace AILifeAnalytics.Application.DTOs;
@@ -63,7 +64,7 @@ public class MetricsResponse
     public double BurnoutRisk { get; set; }
     public double LifeBalanceIndex { get; set; }
     public int ConsistencyStreak { get; set; }
-    public string BurnoutStatus { get; set; } = "Low";
+    public BurnoutStatus BurnoutStatus { get; set; } 
 }
 
 public class ChartDataPoint
@@ -84,7 +85,7 @@ public class InsightResponse
     public Guid Id { get; set; }
     public DateTime Date { get; set; }
     public string Content { get; set; } = string.Empty;
-    public string AnalysisType { get; set; } = string.Empty;
+    public AnalysisType AnalysisType { get; set; }
     public double ProductivityScore { get; set; }
     public double BurnoutRisk { get; set; }
 }
@@ -143,4 +144,17 @@ public class SettingsResponse
 {
     public IEnumerable<ProviderInfo> Providers { get; set; } = [];
     public ProxySettingsDto Proxy { get; set; } = new();
+}
+
+public class RegisterRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+}
+
+public class LoginRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
