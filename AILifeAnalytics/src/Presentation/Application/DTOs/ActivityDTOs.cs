@@ -115,6 +115,7 @@ public class SaveSettingsRequest
 {
     public string ActiveProvider { get; set; } = "OpenAI";
     public Dictionary<string, string> ApiKeys { get; set; } = new();
+    public ProxySettingsDto Proxy { get; set; } = new();
 }
 
 public class ProxySettings

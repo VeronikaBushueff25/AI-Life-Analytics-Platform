@@ -5,43 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AILifeAnalytics.Controllers
 {
-    // ── DTOs ────────────────────────────────────────────────────────────────
-
-    public class ProviderInfo
-    {
-        public string Name { get; set; } = string.Empty;
-        public bool HasKey { get; set; }
-        public bool IsActive { get; set; }
-    }
-
-    public class SaveSettingsRequest
-    {
-        public string ActiveProvider { get; set; } = "OpenAI";
-        public Dictionary<string, string> ApiKeys { get; set; } = new();
-        public ProxySettingsDto Proxy { get; set; } = new();
-    }
-
-    public class ProxySettingsDto
-    {
-        public bool Enabled { get; set; } = false;
-        public string Host { get; set; } = "";
-        public int Port { get; set; } = 1080;
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
-    }
-
-    public class SettingsResponse
-    {
-        public IEnumerable<ProviderInfo> Providers { get; set; } = [];
-        public ProxySettingsDto Proxy { get; set; } = new();
-    }
-
-    // ── Controller ───────────────────────────────────────────────────────────
 
     [ApiController]
     [Route("api/settings")]
     [Produces("application/json")]
-    public class SettingsController : ControllerBase
+    public class SettingsController : BaseController
     {
         private readonly ISettingsRepository _settingsRepo;
         private readonly IEnumerable<IAIProvider> _providers;

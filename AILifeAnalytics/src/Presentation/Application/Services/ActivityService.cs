@@ -1,4 +1,4 @@
-using AILifeAnalytics.Application.DTOs;
+﻿using AILifeAnalytics.Application.DTOs;
 using AILifeAnalytics.Domain.Entities;
 using AILifeAnalytics.Domain.Interfaces;
 
@@ -15,38 +15,30 @@ public class ActivityService
         _metricsService = metricsService;
     }
 
-    public async Task<DashboardResponse> GetDashboardAsync()
+    public async Task<DashboardResponse> GetDashboardAsync(Guid userId)
     {
-        var all = (await _activityRepo.GetAllAsync())
-            .OrderByDescending(a => a.Date)
-            .ToList();
+        var all = (await _activityRepo.GetByUserAsync(userId)).OrderByDescending(a => a.Date).ToList();
 
         var metrics = await _metricsService.CalculateAsync(all);
         var recent = all.Take(30).ToList();
 
-        var productivityChart = recent
-            .OrderBy(a => a.Date)
-            .Select(a => new ChartDataPoint
-            {
-                Label = a.Date.ToString("MM/dd"),
-                Value = _metricsService.CalculateProductivityScore(a)
-            });
+        var productivityChart = recent.OrderBy(a => a.Date).Select(a => new ChartDataPoint
+        {
+            Label = a.Date.ToString("MM/dd"),
+            Value = _metricsService.CalculateProductivityScore(a)
+        });
 
-        var moodChart = recent
-            .OrderBy(a => a.Date)
-            .Select(a => new ChartDataPoint
-            {
-                Label = a.Date.ToString("MM/dd"),
-                Value = a.Mood * 10
-            });
+        var moodChart = recent.OrderBy(a => a.Date).Select(a => new ChartDataPoint
+        {
+            Label = a.Date.ToString("MM/dd"),
+            Value = a.Mood * 10
+        });
 
-        var sleepChart = recent
-            .OrderBy(a => a.Date)
-            .Select(a => new ChartDataPoint
-            {
-                Label = a.Date.ToString("MM/dd"),
-                Value = a.SleepHours
-            });
+        var sleepChart = recent.OrderBy(a => a.Date).Select(a => new ChartDataPoint
+        {
+            Label = a.Date.ToString("MM/dd"),
+            Value = a.SleepHours
+        });
 
         var avgSleep = all.Any() ? all.Average(a => a.SleepHours) : 0;
         var avgWork = all.Any() ? all.Average(a => a.WorkHours) : 0;
@@ -76,16 +68,18 @@ public class ActivityService
         };
     }
 
-    public async Task<ActivityResponse> CreateAsync(CreateActivityRequest request)
+    public async Task<ActivityResponse> CreateAsync(CreateActivityRequest request, Guid userId)
     {
-        // Check for duplicate date
-        var existing = await _activityRepo.GetByDateAsync(request.Date.Date);
+        var dateUtc = DateTime.SpecifyKind(request.Date.Date, DateTimeKind.Utc);
+        var existing = await _activityRepo.GetByUserAndDateAsync(userId, dateUtc);
+
         if (existing != null)
-            throw new InvalidOperationException($"Entry for {request.Date:yyyy-MM-dd} already exists.");
+            throw new InvalidOperationException($"Entry for {dateUtc:yyyy-MM-dd} already exists.");
 
         var activity = new Activity
         {
-            Date = request.Date.Date,
+            UserId = userId,          // ← ключевое исправление
+            Date = dateUtc,
             SleepHours = request.SleepHours,
             WorkHours = request.WorkHours,
             FocusLevel = request.FocusLevel,
@@ -97,12 +91,14 @@ public class ActivityService
         return MapToResponse(created);
     }
 
-    public async Task<ActivityResponse> UpdateAsync(Guid id, UpdateActivityRequest request)
+    public async Task<ActivityResponse> UpdateAsync(Guid id, UpdateActivityRequest request, Guid userId)
     {
-        var existing = await _activityRepo.GetByIdAsync(id)
-            ?? throw new KeyNotFoundException($"Activity {id} not found.");
+        var existing = await _activityRepo.GetByIdAsync(id) ?? throw new KeyNotFoundException($"Activity {id} not found.");
 
-        existing.Date = request.Date.Date;
+        if (existing.UserId != userId)
+            throw new UnauthorizedAccessException("Access denied.");
+
+        existing.Date = DateTime.SpecifyKind(request.Date.Date, DateTimeKind.Utc);
         existing.SleepHours = request.SleepHours;
         existing.WorkHours = request.WorkHours;
         existing.FocusLevel = request.FocusLevel;
@@ -114,11 +110,19 @@ public class ActivityService
         return MapToResponse(updated);
     }
 
-    public async Task<bool> DeleteAsync(Guid id) => await _activityRepo.DeleteAsync(id);
-
-    public async Task<IEnumerable<ActivityResponse>> GetAllAsync()
+    public async Task<bool> DeleteAsync(Guid id, Guid userId)
     {
-        var all = await _activityRepo.GetAllAsync();
+        var existing = await _activityRepo.GetByIdAsync(id);
+
+        if (existing is null || existing.UserId != userId)
+            return false;
+
+        return await _activityRepo.DeleteAsync(id);
+    }
+
+    public async Task<IEnumerable<ActivityResponse>> GetAllAsync(Guid userId)
+    {
+        var all = await _activityRepo.GetByUserAsync(userId);
         return all.OrderByDescending(a => a.Date).Select(MapToResponse);
     }
 

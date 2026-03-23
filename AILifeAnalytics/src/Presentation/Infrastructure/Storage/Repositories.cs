@@ -48,14 +48,19 @@ public abstract class JsonRepositoryBase<T>
     }
 }
 
-// --- Activity Repository ---
+// Activity Repository
 
 public class ActivityRepository : JsonRepositoryBase<Activity>, IActivityRepository
 {
-    public ActivityRepository(IConfiguration config, ILogger<ActivityRepository> logger)
-        : base(config["DataDirectory"] ?? "data", "activities.json", logger) { }
+    public ActivityRepository(IConfiguration config, ILogger<ActivityRepository> logger) : base(config["DataDirectory"] ?? "data", "activities.json", logger) { }
 
     public async Task<IEnumerable<Activity>> GetAllAsync() => await ReadAllAsync();
+
+    public async Task<IEnumerable<Activity>> GetByUserAsync(Guid userId)
+    {
+        var all = await ReadAllAsync();
+        return all.Where(a => a.UserId == userId).OrderByDescending(a => a.Date);
+    }
 
     public async Task<Activity?> GetByIdAsync(Guid id)
     {
@@ -69,11 +74,16 @@ public class ActivityRepository : JsonRepositoryBase<Activity>, IActivityReposit
         return all.FirstOrDefault(a => a.Date.Date == date.Date);
     }
 
+    public async Task<Activity?> GetByUserAndDateAsync(Guid userId, DateTime date)
+    {
+        var all = await ReadAllAsync();
+        return all.FirstOrDefault(a => a.UserId == userId && a.Date.Date == date.Date);
+    }
+
     public async Task<IEnumerable<Activity>> GetByDateRangeAsync(DateTime from, DateTime to)
     {
         var all = await ReadAllAsync();
-        return all.Where(a => a.Date.Date >= from.Date && a.Date.Date <= to.Date)
-                  .OrderByDescending(a => a.Date);
+        return all.Where(a => a.Date.Date >= from.Date && a.Date.Date <= to.Date).OrderByDescending(a => a.Date);
     }
 
     public async Task<Activity> CreateAsync(Activity activity)
@@ -103,14 +113,19 @@ public class ActivityRepository : JsonRepositoryBase<Activity>, IActivityReposit
     }
 }
 
-// --- Insight Repository ---
+// Insight Repository
 
 public class InsightRepository : JsonRepositoryBase<Insight>, IInsightRepository
 {
-    public InsightRepository(IConfiguration config, ILogger<InsightRepository> logger)
-        : base(config["DataDirectory"] ?? "data", "insights.json", logger) { }
+    public InsightRepository(IConfiguration config, ILogger<InsightRepository> logger) : base(config["DataDirectory"] ?? "data", "insights.json", logger) { }
 
     public async Task<IEnumerable<Insight>> GetAllAsync() => await ReadAllAsync();
+
+    public async Task<IEnumerable<Insight>> GetByUserAsync(Guid userId, int count = 10)
+    {
+        var all = await ReadAllAsync();
+        return all.Where(i => i.UserId == userId).OrderByDescending(i => i.CreatedAt).Take(count);
+    }
 
     public async Task<Insight> CreateAsync(Insight insight)
     {
@@ -126,6 +141,7 @@ public class InsightRepository : JsonRepositoryBase<Insight>, IInsightRepository
         return all.OrderByDescending(i => i.CreatedAt).Take(count);
     }
 }
+
 public class SettingsRepository : ISettingsRepository
 {
     private readonly string _filePath;

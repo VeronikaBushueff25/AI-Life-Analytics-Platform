@@ -6,6 +6,7 @@ namespace AILifeAnalytics.Domain.Interfaces;
 public interface IInsightRepository
 {
     Task<IEnumerable<Insight>> GetAllAsync();
+    Task<IEnumerable<Insight>> GetByUserAsync(Guid userId, int count = 10); 
     Task<Insight> CreateAsync(Insight insight);
     Task<IEnumerable<Insight>> GetRecentAsync(int count = 10);
 }
@@ -23,8 +24,10 @@ public interface IMetricsService
 public interface IActivityRepository
 {
     Task<IEnumerable<Activity>> GetAllAsync();
+    Task<IEnumerable<Activity>> GetByUserAsync(Guid userId);           
     Task<Activity?> GetByIdAsync(Guid id);
     Task<Activity?> GetByDateAsync(DateTime date);
+    Task<Activity?> GetByUserAndDateAsync(Guid userId, DateTime date); 
     Task<IEnumerable<Activity>> GetByDateRangeAsync(DateTime from, DateTime to);
     Task<Activity> CreateAsync(Activity activity);
     Task<Activity> UpdateAsync(Activity activity);

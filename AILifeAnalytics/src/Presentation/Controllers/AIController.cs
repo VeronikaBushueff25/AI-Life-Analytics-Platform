@@ -2,115 +2,114 @@
 using AILifeAnalytics.Domain.Entities;
 using AILifeAnalytics.Domain.Enums;
 using AILifeAnalytics.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-namespace AILifeAnalytics.Controllers
+namespace AILifeAnalytics.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/ai")]
+[Produces("application/json")]
+public class AIController : ControllerBase
 {
-    [ApiController]
-    [Route("api/ai")]
-    [Produces("application/json")]
-    public class AIController : ControllerBase
+    private readonly IAIService _aiService;
+    private readonly IActivityRepository _activityRepo;
+    private readonly IInsightRepository _insightRepo;
+    private readonly IMetricsService _metricsService;
+    private readonly ILogger<AIController> _logger;
+
+    private Guid UserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    public AIController(
+        IAIService aiService,
+        IActivityRepository activityRepo,
+        IInsightRepository insightRepo,
+        IMetricsService metricsService,
+        ILogger<AIController> logger)
     {
-        private readonly IAIService _aiService;
-        private readonly IActivityRepository _activityRepo;
-        private readonly IInsightRepository _insightRepo;
-        private readonly IMetricsService _metricsService;
-        private readonly ILogger<AIController> _logger;
+        _aiService = aiService;
+        _activityRepo = activityRepo;
+        _insightRepo = insightRepo;
+        _metricsService = metricsService;
+        _logger = logger;
+    }
 
-        public AIController(
-            IAIService aiService,
-            IActivityRepository activityRepo,
-            IInsightRepository insightRepo,
-            IMetricsService metricsService,
-            ILogger<AIController> logger)
+    [HttpPost("analyze")]
+    public async Task<ActionResult<ApiResponse<InsightResponse>>> Analyze()
+    {
+        var activities = (await _activityRepo.GetByUserAsync(UserId)).OrderByDescending(a => a.Date).Take(14).ToList();
+
+        if (!activities.Any())
+            return BadRequest(ApiResponse<InsightResponse>.Fail("No data available for analysis."));
+
+        var metrics = await _metricsService.CalculateAsync(activities);
+        var content = await _aiService.GenerateInsightAsync(activities, metrics);
+
+        var insight = new Insight
         {
-            _aiService = aiService;
-            _activityRepo = activityRepo;
-            _insightRepo = insightRepo;
-            _metricsService = metricsService;
-            _logger = logger;
-        }
+            UserId = UserId,
+            Content = content,
+            Date = DateTime.UtcNow,
+            AnalysisType = AnalysisType.General,
+            ProductivityScore = metrics.ProductivityScore,
+            BurnoutRisk = metrics.BurnoutRisk
+        };
 
-        /// <summary>
-        /// Generate AI insight based on recent data
-        /// </summary>
-        [HttpPost("analyze")]
-        public async Task<ActionResult<ApiResponse<InsightResponse>>> Analyze()
+        var saved = await _insightRepo.CreateAsync(insight);
+
+        return Ok(ApiResponse<InsightResponse>.Ok(new InsightResponse
         {
-            var activities = (await _activityRepo.GetAllAsync()).OrderByDescending(a => a.Date).Take(14).ToList();
+            Id = saved.Id,
+            Date = saved.Date,
+            Content = saved.Content,
+            AnalysisType = saved.AnalysisType,
+            ProductivityScore = saved.ProductivityScore,
+            BurnoutRisk = saved.BurnoutRisk
+        }));
+    }
 
-            if (!activities.Any())
-                return BadRequest(ApiResponse<InsightResponse>.Fail("No data available for analysis."));
+    [HttpPost("patterns")]
+    public async Task<ActionResult<ApiResponse<InsightResponse>>> AnalyzePatterns()
+    {
+        var activities = (await _activityRepo.GetByUserAsync(UserId)).OrderByDescending(a => a.Date).Take(14).ToList();
+        var content = await _aiService.AnalyzePatternAsync(activities);
 
-            var metrics = await _metricsService.CalculateAsync(activities);
-            var content = await _aiService.GenerateInsightAsync(activities, metrics);
-
-            var insight = new Insight
-            {
-                Content = content,
-                Date = DateTime.UtcNow,
-                AnalysisType = AnalysisType.General,
-                ProductivityScore = metrics.ProductivityScore,
-                BurnoutRisk = metrics.BurnoutRisk
-            };
-
-            var saved = await _insightRepo.CreateAsync(insight);
-
-            return Ok(ApiResponse<InsightResponse>.Ok(new InsightResponse
-            {
-                Id = saved.Id,
-                Date = saved.Date,
-                Content = saved.Content,
-                AnalysisType = saved.AnalysisType,
-                ProductivityScore = saved.ProductivityScore,
-                BurnoutRisk = saved.BurnoutRisk
-            }));
-        }
-
-        /// <summary>
-        /// Analyze behavioral patterns over time
-        /// </summary>
-        [HttpPost("patterns")]
-        public async Task<ActionResult<ApiResponse<InsightResponse>>> AnalyzePatterns()
+        var insight = new Insight
         {
-            var activities = (await _activityRepo.GetAllAsync()).OrderByDescending(a => a.Date).Take(14).ToList();
-            var content = await _aiService.AnalyzePatternAsync(activities);
+            UserId = UserId,        
+            Content = content,
+            Date = DateTime.UtcNow,
+            AnalysisType = AnalysisType.Patterns
+        };
 
-            var insight = new Insight
-            {
-                Content = content,
-                Date = DateTime.UtcNow,
-                AnalysisType = AnalysisType.Patterns
-            };
+        var saved = await _insightRepo.CreateAsync(insight);
 
-            var saved = await _insightRepo.CreateAsync(insight);
-
-            return Ok(ApiResponse<InsightResponse>.Ok(new InsightResponse
-            {
-                Id = saved.Id,
-                Date = saved.Date,
-                Content = saved.Content,
-                AnalysisType = saved.AnalysisType
-            }));
-        }
-
-        /// <summary>
-        /// Get insight history
-        /// </summary>
-        [HttpGet("insights")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<InsightResponse>>>> GetInsights([FromQuery] int count = 10)
+        return Ok(ApiResponse<InsightResponse>.Ok(new InsightResponse
         {
-            var insights = await _insightRepo.GetRecentAsync(count);
-            var response = insights.Select(i => new InsightResponse
-            {
-                Id = i.Id,
-                Date = i.Date,
-                Content = i.Content,
-                AnalysisType = i.AnalysisType,
-                ProductivityScore = i.ProductivityScore,
-                BurnoutRisk = i.BurnoutRisk
-            });
-            return Ok(ApiResponse<IEnumerable<InsightResponse>>.Ok(response));
-        }
+            Id = saved.Id,
+            Date = saved.Date,
+            Content = saved.Content,
+            AnalysisType = saved.AnalysisType
+        }));
+    }
+
+    [HttpGet("insights")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<InsightResponse>>>> GetInsights([FromQuery] int count = 10)
+    {
+        var insights = await _insightRepo.GetByUserAsync(UserId, count);
+
+        var response = insights.Select(i => new InsightResponse
+        {
+            Id = i.Id,
+            Date = i.Date,
+            Content = i.Content,
+            AnalysisType = i.AnalysisType,
+            ProductivityScore = i.ProductivityScore,
+            BurnoutRisk = i.BurnoutRisk
+        });
+
+        return Ok(ApiResponse<IEnumerable<InsightResponse>>.Ok(response));
     }
 }

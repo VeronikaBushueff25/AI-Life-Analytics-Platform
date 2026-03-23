@@ -70,8 +70,7 @@ public class EfInsightRepository : IInsightRepository
     public async Task<IEnumerable<Insight>> GetAllAsync() => await _db.Insights.OrderByDescending(i => i.CreatedAt).ToListAsync();
 
     public async Task<IEnumerable<Insight>> GetByUserAsync(Guid userId, int count = 10) =>
-        await _db.Insights.Where(i => i.UserId == userId)
-            .OrderByDescending(i => i.CreatedAt).Take(count).ToListAsync();
+        await _db.Insights.Where(i => i.UserId == userId).OrderByDescending(i => i.CreatedAt).Take(count).ToListAsync();
 
     public async Task<Insight> CreateAsync(Insight insight)
     {
