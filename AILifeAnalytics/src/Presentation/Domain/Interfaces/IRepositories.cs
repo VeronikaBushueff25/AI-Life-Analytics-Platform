@@ -42,6 +42,7 @@ public interface IAIProvider
     string ProviderName { get; } 
     Task<string> GenerateInsightAsync(IEnumerable<Activity> activities, Metrics metrics);
     Task<string> AnalyzePatternAsync(IEnumerable<Activity> activities);
+    Task<string> GenerateProfileAsync(string prompt);
 }
 
 /// <summary>
@@ -52,6 +53,7 @@ public interface IAIService
 {
     Task<string> GenerateInsightAsync(IEnumerable<Activity> activities, Metrics metrics);
     Task<string> AnalyzePatternAsync(IEnumerable<Activity> activities);
+    Task<string> GenerateProfileAsync(string prompt);
 }
 
 /// <summary>
@@ -93,4 +95,14 @@ public interface IAuthService
     Task<AuthResult> RegisterAsync(string email, string password, string name);
     Task<AuthResult> LoginAsync(string email, string password);
     Task<User?> GetUserByTokenAsync(string token);
+}
+
+/// <summary>
+/// AI-профиль личности
+/// </summary>
+public interface IPersonalityProfileRepository
+{
+    Task<PersonalityProfile> CreateAsync(PersonalityProfile profile);
+    Task<PersonalityProfile?> GetLatestByUserAsync(Guid userId);
+    Task<IEnumerable<PersonalityProfile>> GetHistoryByUserAsync(Guid userId, int count = 5);
 }

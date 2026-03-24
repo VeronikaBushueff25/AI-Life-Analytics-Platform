@@ -159,3 +159,29 @@ public class LoginRequest
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }
+
+public class ProfileResponse
+{
+    public Guid Id { get; set; }
+    public DateTime GeneratedAt { get; set; }
+    public DateTime PeriodFrom { get; set; }
+    public DateTime PeriodTo { get; set; }
+    public int DaysAnalyzed { get; set; }
+    public string ArchetypeName { get; set; } = string.Empty;
+    public string ArchetypeEmoji { get; set; } = string.Empty;
+    public string ArchetypeDescription { get; set; } = string.Empty;
+    public string PeakPerformancePattern { get; set; } = string.Empty;
+    public string EnergyPattern { get; set; } = string.Empty;
+    public string StressPattern { get; set; } = string.Empty;
+    public List<string> Superpowers { get; set; } = [];
+    public List<string> Vulnerabilities { get; set; } = [];
+    public List<string> Recommendations { get; set; } = [];
+    public double OptimalSleepHours { get; set; }
+    public double OptimalWorkHours { get; set; }
+    public string MostProductiveDayOfWeek { get; set; } = string.Empty;
+    public double CorrelationSleepFocus { get; set; }
+    public double CorrelationStressMood { get; set; }
+    public string ForecastText { get; set; } = string.Empty;
+    public string ForecastRisk { get; set; } = string.Empty;
+    public string FullAnalysis { get; set; } = string.Empty;
+}

@@ -61,3 +61,9 @@ const AuthApi = {
     register: (email, password, name) => apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ email, password, name }) }),
     me: () => apiFetch('/auth/me'),
 };
+
+const ProfileApi = {
+    generate: () => apiFetch('/profile/generate', { method: 'POST' }),
+    getLatest: () => apiFetch('/profile/latest'),
+    getHistory: (count = 5) => apiFetch(`/profile/history?count=${count}`),
+};

@@ -78,6 +78,9 @@ builder.Services.AddScoped<IAIProvider, HuggingFaceProvider>();
 builder.Services.AddScoped<IAIProvider, GoogleAIProvider>();
 builder.Services.AddScoped<IAIService, AIProviderFactory>();
 
+builder.Services.AddScoped<IPersonalityProfileRepository, EfPersonalityProfileRepository>();
+builder.Services.AddScoped<PersonalityProfileService>();
+
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));

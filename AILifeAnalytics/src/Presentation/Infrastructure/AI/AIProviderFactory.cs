@@ -37,4 +37,10 @@ public class AIProviderFactory : IAIService
         var provider = await GetActiveProviderAsync();
         return await provider.AnalyzePatternAsync(activities);
     }
+
+    public async Task<string> GenerateProfileAsync(string prompt)
+    {
+        var provider = await GetActiveProviderAsync();
+        return await provider.GenerateProfileAsync(prompt);
+    }
 }

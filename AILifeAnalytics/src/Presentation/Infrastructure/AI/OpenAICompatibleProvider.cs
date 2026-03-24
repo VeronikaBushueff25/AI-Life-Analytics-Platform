@@ -188,6 +188,8 @@ public abstract class OpenAICompatibleProvider : IAIProvider
         return new HttpClient(handler);
     }
 
+    public async Task<string> GenerateProfileAsync(string prompt) => await CallAsync(prompt);
+
     private string HandleError(string responseBody)
     {
         try

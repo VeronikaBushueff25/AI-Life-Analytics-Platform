@@ -141,3 +141,23 @@ public class EfUserSettingsRepository : IUserSettingsRepository
         return settings;
     }
 }
+
+public class EfPersonalityProfileRepository : IPersonalityProfileRepository
+{
+    private readonly AppDbContext _db;
+    public EfPersonalityProfileRepository(AppDbContext db) => _db = db;
+
+    public async Task<PersonalityProfile> CreateAsync(PersonalityProfile profile)
+    {
+        _db.PersonalityProfiles.Add(profile);
+        await _db.SaveChangesAsync();
+        return profile;
+    }
+
+    public async Task<PersonalityProfile?> GetLatestByUserAsync(Guid userId) => await _db.PersonalityProfiles
+            .Where(p => p.UserId == userId).OrderByDescending(p => p.GeneratedAt).FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<PersonalityProfile>> GetHistoryByUserAsync(
+        Guid userId, int count = 5) => await _db.PersonalityProfiles
+            .Where(p => p.UserId == userId).OrderByDescending(p => p.GeneratedAt).Take(count).ToListAsync();
+}

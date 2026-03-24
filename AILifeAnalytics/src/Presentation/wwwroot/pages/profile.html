@@ -1,0 +1,147 @@
+﻿<div class="page-header">
+    <div>
+        <h1 class="page-title">Мой профиль</h1>
+        <p class="page-subtitle" id="profile-subtitle">Поведенческий портрет на основе ваших данных</p>
+    </div>
+    <button class="btn btn-primary" onclick="generateProfile()" id="generate-profile-btn">
+        ✦ Построить профиль
+    </button>
+</div>
+
+<!-- Состояние: нет профиля -->
+<div id="profile-empty" style="display:none">
+    <div class="profile-empty-card">
+        <div class="profile-empty-icon">🧬</div>
+        <h3>Профиль ещё не построен</h3>
+        <p>Нужно минимум 7 дней записей. У вас достаточно данных — нажмите «Построить профиль».</p>
+    </div>
+</div>
+
+<!-- Состояние: загрузка -->
+<div id="profile-loading" style="display:none">
+    <div class="profile-loading-card">
+        <div class="profile-loading-spinner"></div>
+        <p id="profile-loading-text">AI анализирует ваши данные...</p>
+    </div>
+</div>
+
+<!-- Профиль -->
+<div id="profile-content" style="display:none">
+
+    <!-- Архетип — главная карточка -->
+    <div class="archetype-card">
+        <div class="archetype-left">
+            <div class="archetype-emoji" id="archetype-emoji">🦉</div>
+            <div>
+                <div class="archetype-name" id="archetype-name">Ночной марафонец</div>
+                <div class="archetype-period" id="archetype-period">Анализ за 47 дней</div>
+            </div>
+        </div>
+        <div class="archetype-desc" id="archetype-desc"></div>
+    </div>
+
+    <!-- Паттерны -->
+    <div class="profile-grid-3">
+        <div class="profile-pattern-card peak">
+            <div class="pattern-icon">⚡</div>
+            <div class="pattern-label">Пик продуктивности</div>
+            <div class="pattern-text" id="peak-pattern"></div>
+        </div>
+        <div class="profile-pattern-card energy">
+            <div class="pattern-icon">🔋</div>
+            <div class="pattern-label">Восстановление энергии</div>
+            <div class="pattern-text" id="energy-pattern"></div>
+        </div>
+        <div class="profile-pattern-card stress">
+            <div class="pattern-icon">⚠️</div>
+            <div class="pattern-label">Триггеры стресса</div>
+            <div class="pattern-text" id="stress-pattern"></div>
+        </div>
+    </div>
+
+    <!-- Суперсилы и уязвимости -->
+    <div class="profile-grid-2">
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-icon">🦾</span>
+                <h3>Суперсилы</h3>
+            </div>
+            <ul class="profile-list superpowers" id="superpowers-list"></ul>
+        </div>
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-icon">🎯</span>
+                <h3>Уязвимости</h3>
+            </div>
+            <ul class="profile-list vulnerabilities" id="vulnerabilities-list"></ul>
+        </div>
+    </div>
+
+    <!-- Числовая аналитика -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <span class="profile-card-icon">📊</span>
+            <h3>Твои оптимальные условия</h3>
+        </div>
+        <div class="optimal-grid">
+            <div class="optimal-item">
+                <div class="optimal-value" id="opt-sleep">—</div>
+                <div class="optimal-label">Оптимальный сон</div>
+            </div>
+            <div class="optimal-item">
+                <div class="optimal-value" id="opt-work">—</div>
+                <div class="optimal-label">Оптимальная работа</div>
+            </div>
+            <div class="optimal-item">
+                <div class="optimal-value" id="opt-day">—</div>
+                <div class="optimal-label">Лучший день недели</div>
+            </div>
+            <div class="optimal-item">
+                <div class="optimal-value" id="corr-sleep" data-raw="0">—</div>
+                <div class="optimal-label">Сон → Фокус</div>
+            </div>
+            <div class="optimal-item">
+                <div class="optimal-value" id="corr-stress" data-raw="0">—</div>
+                <div class="optimal-label">Стресс → Настроение</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Рекомендации -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <span class="profile-card-icon">🚀</span>
+            <h3>Топ рекомендации</h3>
+        </div>
+        <ol class="profile-recommendations" id="recommendations-list"></ol>
+    </div>
+
+    <!-- Прогноз -->
+    <div class="profile-forecast-card" id="forecast-card">
+        <div class="forecast-header">
+            <span class="profile-card-icon">🔮</span>
+            <h3>Прогноз</h3>
+            <span class="forecast-risk-badge" id="forecast-risk-badge">Medium</span>
+        </div>
+        <p class="forecast-text" id="forecast-text"></p>
+    </div>
+
+    <!-- Полный анализ -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <span class="profile-card-icon">🧠</span>
+            <h3>Полный анализ</h3>
+        </div>
+        <p class="full-analysis-text" id="full-analysis"></p>
+    </div>
+
+    <!-- История профилей -->
+    <div id="profile-history-section" style="display:none">
+        <div class="profile-history-header">
+            <h3>История профилей</h3>
+            <span class="profile-history-desc">Как вы менялись со временем</span>
+        </div>
+        <div class="profile-history-list" id="profile-history-list"></div>
+    </div>
+
+</div>

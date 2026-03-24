@@ -8,6 +8,7 @@ const pageInitializers = {
     insights: () => loadInsights(),
     history: () => loadHistory(),
     entry: () => setupEntryForm(),
+    profile: () => loadProfile(),
 };
 
 async function navigate(page) {

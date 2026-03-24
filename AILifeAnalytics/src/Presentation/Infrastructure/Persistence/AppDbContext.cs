@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Activity> Activities { get; set; }
     public DbSet<Insight> Insights { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
+    public DbSet<PersonalityProfile> PersonalityProfiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -63,6 +64,18 @@ public class AppDbContext : DbContext
             e.Property(x => x.ActiveProvider)
              .HasConversion<string>()
              .HasMaxLength(20);
+        });
+
+        mb.Entity<PersonalityProfile>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.UserId, x.GeneratedAt });
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.ArchetypeName).HasMaxLength(100);
+            e.Property(x => x.FullAnalysis).HasMaxLength(5000);
         });
     }
 }
