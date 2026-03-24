@@ -67,3 +67,16 @@ const ProfileApi = {
     getLatest: () => apiFetch('/profile/latest'),
     getHistory: (count = 5) => apiFetch(`/profile/history?count=${count}`),
 };
+
+const CbtApi = {
+    getAll: (count = 20) => apiFetch(`/cbt?count=${count}`),
+    getById: (id) => apiFetch(`/cbt/${id}`),
+    create: (payload) => apiFetch('/cbt', {
+        method: 'POST', body: JSON.stringify(payload)
+    }),
+    complete: (id, payload) => apiFetch(`/cbt/${id}/complete`, {
+        method: 'PUT', body: JSON.stringify(payload)
+    }),
+    delete: (id) => apiFetch(`/cbt/${id}`, { method: 'DELETE' }),
+    getStats: () => apiFetch('/cbt/stats'),
+};

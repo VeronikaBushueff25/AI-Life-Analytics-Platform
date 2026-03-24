@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Insight> Insights { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<PersonalityProfile> PersonalityProfiles { get; set; }
+    public DbSet<CbtRecord> CbtRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -76,6 +77,24 @@ public class AppDbContext : DbContext
              .OnDelete(DeleteBehavior.Cascade);
             e.Property(x => x.ArchetypeName).HasMaxLength(100);
             e.Property(x => x.FullAnalysis).HasMaxLength(5000);
+        });
+
+        mb.Entity<CbtRecord>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.UserId, x.CreatedAt });
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.Type)
+             .HasConversion<string>().HasMaxLength(30);
+            e.Property(x => x.PrimaryEmotion)
+             .HasConversion<string>().HasMaxLength(30);
+            e.Property(x => x.Situation).HasMaxLength(1000);
+            e.Property(x => x.AutomaticThought).HasMaxLength(500);
+            e.Property(x => x.AiChallenge).HasMaxLength(2000);
+            e.Property(x => x.AiSummary).HasMaxLength(2000);
         });
     }
 }

@@ -43,6 +43,7 @@ public interface IAIProvider
     Task<string> GenerateInsightAsync(IEnumerable<Activity> activities, Metrics metrics);
     Task<string> AnalyzePatternAsync(IEnumerable<Activity> activities);
     Task<string> GenerateProfileAsync(string prompt);
+    Task<string> GenerateCbtAnalysisAsync(string prompt);
 }
 
 /// <summary>
@@ -51,9 +52,34 @@ public interface IAIProvider
 /// </summary>
 public interface IAIService
 {
+    /// <summary>
+    /// Генерация инстайтов
+    /// </summary>
+    /// <param name="activities"></param>
+    /// <param name="metrics"></param>
+    /// <returns></returns>
     Task<string> GenerateInsightAsync(IEnumerable<Activity> activities, Metrics metrics);
+
+    /// <summary>
+    /// Анализ патернов
+    /// </summary>
+    /// <param name="activities"></param>
+    /// <returns></returns>
     Task<string> AnalyzePatternAsync(IEnumerable<Activity> activities);
+
+    /// <summary>
+    /// Генерация профиля
+    /// </summary>
+    /// <param name="prompt"></param>
+    /// <returns></returns>
     Task<string> GenerateProfileAsync(string prompt);
+
+    /// <summary>
+    /// Генерация КПТ-практики
+    /// </summary>
+    /// <param name="prompt"></param>
+    /// <returns></returns>
+    Task<string> GenerateCbtAnalysisAsync(string prompt);
 }
 
 /// <summary>
@@ -105,4 +131,20 @@ public interface IPersonalityProfileRepository
     Task<PersonalityProfile> CreateAsync(PersonalityProfile profile);
     Task<PersonalityProfile?> GetLatestByUserAsync(Guid userId);
     Task<IEnumerable<PersonalityProfile>> GetHistoryByUserAsync(Guid userId, int count = 5);
+}
+
+/// <summary>
+/// КПТ
+/// </summary>
+public interface ICbtRepository
+{
+    Task<CbtRecord> CreateAsync(CbtRecord record);
+    Task<CbtRecord> UpdateAsync(CbtRecord record);
+    Task<CbtRecord?> GetByIdAsync(Guid id);
+    Task<IEnumerable<CbtRecord>> GetByUserAsync(Guid userId, int count = 20);
+    Task<IEnumerable<CbtRecord>> GetCompletedByUserAsync(Guid userId);
+    Task<bool> DeleteAsync(Guid id);
+
+    // Аналитика
+    Task<Dictionary<string, int>> GetDistortionStatsAsync(Guid userId);
 }

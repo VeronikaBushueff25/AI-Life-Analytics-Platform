@@ -81,6 +81,9 @@ builder.Services.AddScoped<IAIService, AIProviderFactory>();
 builder.Services.AddScoped<IPersonalityProfileRepository, EfPersonalityProfileRepository>();
 builder.Services.AddScoped<PersonalityProfileService>();
 
+builder.Services.AddScoped<ICbtRepository, EfCbtRepository>();
+builder.Services.AddScoped<CbtService>();
+
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));

@@ -1,0 +1,259 @@
+﻿<div class="page-header">
+    <div>
+        <h1 class="page-title">КПТ практики</h1>
+        <p class="page-subtitle">Работа с мыслями по методу когнитивно-поведенческой терапии</p>
+    </div>
+    <button class="btn btn-primary" onclick="startNewCbt()">
+        + Новая сессия
+    </button>
+</div>
+
+<!-- Статистика -->
+<div class="cbt-stats-row" id="cbt-stats-row"></div>
+
+<!-- Форма новой сессии -->
+<div id="cbt-form-section" style="display:none">
+    <div class="cbt-wizard">
+
+        <!-- Шаг 1: Ситуация и мысль -->
+        <div class="cbt-step" id="cbt-step-1">
+            <div class="cbt-step-header">
+                <div class="cbt-step-number">1</div>
+                <div>
+                    <div class="cbt-step-title">Опишите ситуацию</div>
+                    <div class="cbt-step-subtitle">Что произошло? Какая мысль возникла первой?</div>
+                </div>
+            </div>
+
+            <div class="cbt-form-body">
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Ситуация
+                        <span class="cbt-hint">Что конкретно случилось? Факты, без оценок.</span>
+                    </label>
+                    <textarea id="cbt-situation" rows="3"
+                              placeholder="Например: Коллега не ответил на моё сообщение весь день"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Автоматическая мысль
+                        <span class="cbt-hint">Первая мысль, которая пришла в голову</span>
+                    </label>
+                    <textarea id="cbt-thought" rows="2"
+                              placeholder="Например: Я сделал что-то не так, он злится на меня"></textarea>
+                    <div class="cbt-slider-row">
+                        <label>Насколько верю этой мысли:</label>
+                        <input type="range" id="cbt-thought-belief" min="0" max="100" value="70"
+                               oninput="document.getElementById('cbt-thought-belief-val').textContent = this.value + '%'" />
+                        <span id="cbt-thought-belief-val" class="slider-accent">70%</span>
+                    </div>
+                </div>
+
+                <div class="form-row two">
+                    <div class="form-group">
+                        <label class="form-group-label">Основная эмоция</label>
+                        <div class="emotion-grid" id="emotion-grid">
+                            <!-- генерируется JS -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">Интенсивность эмоции</label>
+                        <div class="cbt-slider-row vertical">
+                            <input type="range" id="cbt-emotion-intensity" min="0" max="100" value="60"
+                                   oninput="updateEmotionIntensity(this.value)" />
+                            <span id="cbt-emotion-intensity-val" class="slider-accent">60%</span>
+                        </div>
+                        <div class="emotion-bar-wrap">
+                            <div class="emotion-bar" id="emotion-bar" style="width:60%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Поведение
+                        <span class="cbt-hint">Что вы сделали или захотели сделать?</span>
+                    </label>
+                    <input type="text" id="cbt-behavior"
+                           placeholder="Например: Стал перечитывать переписку, проверять телефон каждые 5 минут" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Физические ощущения
+                        <span class="cbt-hint">Как тело реагировало? (необязательно)</span>
+                    </label>
+                    <input type="text" id="cbt-physical"
+                           placeholder="Например: Сдавило грудь, участилось дыхание" />
+                </div>
+
+                <div class="cbt-form-actions">
+                    <button class="btn btn-ghost" onclick="closeCbtForm()">Отмена</button>
+                    <button class="btn btn-primary" onclick="submitCbtStep1()" id="cbt-submit-1">
+                        Проанализировать с AI →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Шаг 2: AI анализ -->
+        <div class="cbt-step" id="cbt-step-2" style="display:none">
+            <div class="cbt-step-header">
+                <div class="cbt-step-number ai-step">AI</div>
+                <div>
+                    <div class="cbt-step-title">Анализ AI</div>
+                    <div class="cbt-step-subtitle">Когнитивные искажения и альтернативные перспективы</div>
+                </div>
+            </div>
+
+            <div class="cbt-form-body">
+                <!-- Найденные искажения -->
+                <div class="cbt-distortions-section">
+                    <div class="cbt-section-label">Обнаруженные когнитивные искажения</div>
+                    <div class="distortions-list" id="distortions-list"></div>
+                </div>
+
+                <!-- AI оспаривание -->
+                <div class="cbt-ai-challenge">
+                    <div class="ai-challenge-header">
+                        <span class="ai-badge-small">AI</span>
+                        <span>Взгляд со стороны</span>
+                    </div>
+                    <p id="ai-challenge-text" class="ai-challenge-body"></p>
+                </div>
+
+                <!-- Доказательства -->
+                <div class="cbt-evidence-row">
+                    <div class="evidence-card for">
+                        <div class="evidence-label">✓ Доказательства ЗА мысль</div>
+                        <p id="evidence-for-text"></p>
+                    </div>
+                    <div class="evidence-card against">
+                        <div class="evidence-label">✗ Доказательства ПРОТИВ мысли</div>
+                        <p id="evidence-against-text"></p>
+                    </div>
+                </div>
+
+                <!-- Сократовские вопросы -->
+                <div class="cbt-questions-section">
+                    <div class="cbt-section-label">Вопросы для размышления</div>
+                    <div id="socratic-questions" class="questions-list"></div>
+                </div>
+
+                <div class="cbt-form-actions">
+                    <button class="btn btn-ghost" onclick="showCbtStep(1)">← Назад</button>
+                    <button class="btn btn-primary" onclick="showCbtStep(3)">
+                        Сформулировать новую мысль →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Шаг 3: Переосмысление -->
+        <div class="cbt-step" id="cbt-step-3" style="display:none">
+            <div class="cbt-step-header">
+                <div class="cbt-step-number">3</div>
+                <div>
+                    <div class="cbt-step-title">Новая мысль</div>
+                    <div class="cbt-step-subtitle">Более сбалансированный взгляд на ситуацию</div>
+                </div>
+            </div>
+
+            <div class="cbt-form-body">
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Переформулированная мысль
+                        <span class="cbt-hint">Более реалистичная, сбалансированная версия</span>
+                    </label>
+                    <textarea id="cbt-reframed" rows="3"
+                              placeholder="Например: Коллега мог быть занят или не увидеть сообщение. У меня нет доказательств, что он злится."></textarea>
+                    <div class="cbt-slider-row">
+                        <label>Верю этой мысли:</label>
+                        <input type="range" id="cbt-new-belief" min="0" max="100" value="60"
+                               oninput="document.getElementById('cbt-new-belief-val').textContent = this.value + '%'" />
+                        <span id="cbt-new-belief-val" class="slider-accent">60%</span>
+                    </div>
+                </div>
+
+                <!-- Сравнение эмоций -->
+                <div class="emotion-compare">
+                    <div class="emotion-compare-label">Интенсивность эмоции сейчас</div>
+                    <div class="emotion-compare-row">
+                        <span class="ec-label">Было</span>
+                        <div class="ec-bar-wrap">
+                            <div class="ec-bar old" id="ec-bar-old"></div>
+                            <span class="ec-value" id="ec-val-old"></span>
+                        </div>
+                    </div>
+                    <div class="emotion-compare-row">
+                        <span class="ec-label">Стало</span>
+                        <div class="ec-bar-wrap">
+                            <div class="ec-bar new" id="ec-bar-new"></div>
+                            <span class="ec-value" id="ec-val-new"></span>
+                        </div>
+                    </div>
+                    <input type="range" id="cbt-new-intensity" min="0" max="100" value="30"
+                           oninput="updateNewIntensity(this.value)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">
+                        Главный инсайт
+                        <span class="cbt-hint">Что вы поняли про себя или ситуацию?</span>
+                    </label>
+                    <textarea id="cbt-insight" rows="2"
+                              placeholder="Например: Я склонен к чтению мыслей и катастрофизации в социальных ситуациях"></textarea>
+                </div>
+
+                <div class="cbt-form-actions">
+                    <button class="btn btn-ghost" onclick="showCbtStep(2)">← Назад</button>
+                    <button class="btn btn-primary" onclick="completeCbt()" id="cbt-complete-btn">
+                        Завершить сессию ✓
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Шаг 4: Итог -->
+        <div class="cbt-step" id="cbt-step-4" style="display:none">
+            <div class="cbt-step-header success-header">
+                <div class="cbt-step-number success-step">✓</div>
+                <div>
+                    <div class="cbt-step-title">Сессия завершена</div>
+                    <div class="cbt-step-subtitle">Отличная работа с мыслью!</div>
+                </div>
+            </div>
+            <div class="cbt-form-body">
+                <div class="cbt-success-stats" id="cbt-success-stats"></div>
+                <div class="cbt-ai-summary">
+                    <div class="ai-challenge-header">
+                        <span class="ai-badge-small">AI</span>
+                        <span>Комментарий психолога</span>
+                    </div>
+                    <p id="ai-summary-text" class="ai-challenge-body"></p>
+                </div>
+                <div class="cbt-form-actions">
+                    <button class="btn btn-ghost" onclick="closeCbtForm()">Закрыть</button>
+                    <button class="btn btn-primary" onclick="startNewCbt()">
+                        + Новая сессия
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Список записей -->
+<div id="cbt-list-section">
+    <div class="cbt-list-header">
+        <h3>История сессий</h3>
+        <div class="cbt-filter-tabs">
+            <button class="cbt-filter active" onclick="filterCbt('all', this)">Все</button>
+            <button class="cbt-filter" onclick="filterCbt('completed', this)">Завершённые</button>
+            <button class="cbt-filter" onclick="filterCbt('draft', this)">В процессе</button>
+        </div>
+    </div>
+    <div id="cbt-list" class="cbt-list"></div>
+</div>

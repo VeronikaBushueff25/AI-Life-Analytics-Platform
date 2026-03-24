@@ -185,3 +185,56 @@ public class ProfileResponse
     public string ForecastRisk { get; set; } = string.Empty;
     public string FullAnalysis { get; set; } = string.Empty;
 }
+
+public class CreateCbtRequest
+{
+    public string Situation { get; set; } = string.Empty;
+    public string PhysicalState { get; set; } = string.Empty;
+    public string AutomaticThought { get; set; } = string.Empty;
+    public int ThoughtBelief { get; set; } = 50;
+    public EmotionType PrimaryEmotion { get; set; } = EmotionType.Other;
+    public int EmotionIntensity { get; set; } = 50;
+    public string Behavior { get; set; } = string.Empty;
+}
+
+public class CompleteReframingRequest
+{
+    public string ReframedThought { get; set; } = string.Empty;
+    public int NewThoughtBelief { get; set; } = 50;
+    public int NewEmotionIntensity { get; set; } = 50;
+    public string Insight { get; set; } = string.Empty;
+}
+
+public class CbtRecordResponse
+{
+    public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public bool IsCompleted { get; set; }
+    public string Situation { get; set; } = string.Empty;
+    public string AutomaticThought { get; set; } = string.Empty;
+    public int ThoughtBelief { get; set; }
+    public string PrimaryEmotion { get; set; } = string.Empty;
+    public int EmotionIntensity { get; set; }
+    public string Behavior { get; set; } = string.Empty;
+    public List<string> DetectedDistortions { get; set; } = [];
+    public string AiChallenge { get; set; } = string.Empty;
+    public List<string> AiQuestions { get; set; } = [];
+    public string EvidenceFor { get; set; } = string.Empty;
+    public string EvidenceAgainst { get; set; } = string.Empty;
+    public string ReframedThought { get; set; } = string.Empty;
+    public int NewThoughtBelief { get; set; }
+    public int NewEmotionIntensity { get; set; }
+    public string Insight { get; set; } = string.Empty;
+    public string AiSummary { get; set; } = string.Empty;
+    public int EmotionShift { get; set; } // разница интенсивности
+}
+
+public class CbtStatsResponse
+{
+    public int TotalSessions { get; set; }
+    public int CompletedSessions { get; set; }
+    public double AvgEmotionShift { get; set; }
+    public string TopDistortion { get; set; } = string.Empty;
+    public int TopDistortionCount { get; set; }
+    public Dictionary<string, int> DistortionStats { get; set; } = new();
+}

@@ -43,4 +43,10 @@ public class AIProviderFactory : IAIService
         var provider = await GetActiveProviderAsync();
         return await provider.GenerateProfileAsync(prompt);
     }
+
+    public async Task<string> GenerateCbtAnalysisAsync(string prompt)
+    {
+        var provider = await GetActiveProviderAsync();
+        return await provider.GenerateCbtAnalysisAsync(prompt);
+    }
 }

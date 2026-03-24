@@ -189,6 +189,7 @@ public abstract class OpenAICompatibleProvider : IAIProvider
     }
 
     public async Task<string> GenerateProfileAsync(string prompt) => await CallAsync(prompt);
+    public async Task<string> GenerateCbtAnalysisAsync(string prompt) => await CallAsync(prompt);
 
     private string HandleError(string responseBody)
     {

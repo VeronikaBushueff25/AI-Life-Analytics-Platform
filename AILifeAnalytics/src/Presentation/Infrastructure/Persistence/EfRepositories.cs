@@ -161,3 +161,66 @@ public class EfPersonalityProfileRepository : IPersonalityProfileRepository
         Guid userId, int count = 5) => await _db.PersonalityProfiles
             .Where(p => p.UserId == userId).OrderByDescending(p => p.GeneratedAt).Take(count).ToListAsync();
 }
+
+public class EfCbtRepository : ICbtRepository
+{
+    private readonly AppDbContext _db;
+    public EfCbtRepository(AppDbContext db) => _db = db;
+
+    public async Task<CbtRecord> CreateAsync(CbtRecord record)
+    {
+        _db.CbtRecords.Add(record);
+        await _db.SaveChangesAsync();
+        return record;
+    }
+
+    public async Task<CbtRecord> UpdateAsync(CbtRecord record)
+    {
+        record.UpdatedAt = DateTime.UtcNow;
+        _db.CbtRecords.Update(record);
+        await _db.SaveChangesAsync();
+        return record;
+    }
+
+    public async Task<CbtRecord?> GetByIdAsync(Guid id) =>
+        await _db.CbtRecords.FindAsync(id);
+
+    public async Task<IEnumerable<CbtRecord>> GetByUserAsync(Guid userId, int count = 20) =>
+        await _db.CbtRecords.Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.CreatedAt).Take(count).ToListAsync();
+
+    public async Task<IEnumerable<CbtRecord>> GetCompletedByUserAsync(Guid userId) =>
+        await _db.CbtRecords.Where(r => r.UserId == userId && r.IsCompleted)
+            .OrderByDescending(r => r.CreatedAt).ToListAsync();
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var record = await _db.CbtRecords.FindAsync(id);
+        if (record is null) return false;
+        _db.CbtRecords.Remove(record);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<Dictionary<string, int>> GetDistortionStatsAsync(Guid userId)
+    {
+        var records = await _db.CbtRecords.Where(r => r.UserId == userId && r.IsCompleted)
+            .Select(r => r.DetectedDistortions).ToListAsync();
+
+        var stats = new Dictionary<string, int>();
+        foreach (var json in records)
+        {
+            try
+            {
+                var distortions = System.Text.Json.JsonSerializer
+                    .Deserialize<List<string>>(json) ?? [];
+                foreach (var d in distortions)
+                {
+                    stats[d] = stats.GetValueOrDefault(d, 0) + 1;
+                }
+            }
+            catch { /* skip */ }
+        }
+        return stats;
+    }
+}

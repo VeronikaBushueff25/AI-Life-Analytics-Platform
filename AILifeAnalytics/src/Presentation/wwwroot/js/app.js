@@ -9,6 +9,7 @@ const pageInitializers = {
     history: () => loadHistory(),
     entry: () => setupEntryForm(),
     profile: () => loadProfile(),
+    cbt: () => loadCbt(),
 };
 
 async function navigate(page) {
