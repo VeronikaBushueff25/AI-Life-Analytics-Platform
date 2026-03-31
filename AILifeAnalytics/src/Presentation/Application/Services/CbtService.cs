@@ -175,8 +175,44 @@ public class CbtService
         EvidenceFor = "Требует заполнения.",
         EvidenceAgainst = "Требует заполнения."
     };
-}
 
+    public static CbtRecordResponse MapToResponse(CbtRecord r) => new()
+    {
+        Id = r.Id,
+        CreatedAt = r.CreatedAt,
+        IsCompleted = r.IsCompleted,
+        Situation = r.Situation,
+        AutomaticThought = r.AutomaticThought,
+        ThoughtBelief = r.ThoughtBelief,
+        PrimaryEmotion = r.PrimaryEmotion.ToString(),
+        EmotionIntensity = r.EmotionIntensity,
+        Behavior = r.Behavior,
+
+        DetectedDistortions = TryDeserialize(r.DetectedDistortions),
+        AiChallenge = r.AiChallenge,
+        AiQuestions = TryDeserialize(r.AiQuestions),
+        EvidenceFor = r.EvidenceFor,
+        EvidenceAgainst = r.EvidenceAgainst,
+
+        ReframedThought = r.ReframedThought,
+        NewThoughtBelief = r.NewThoughtBelief,
+        NewEmotionIntensity = r.NewEmotionIntensity,
+        Insight = r.Insight,
+        AiSummary = r.AiSummary,
+        EmotionShift = r.IsCompleted
+        ? r.EmotionIntensity - r.NewEmotionIntensity
+        : 0
+    };
+
+    private static List<string> TryDeserialize(string json)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        }
+        catch { return []; }
+    }
+}
 
 public class CbtAnalysisResult
 {

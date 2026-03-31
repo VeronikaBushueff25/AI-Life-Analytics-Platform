@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿using AILifeAnalytics.Application.DTOs;
 using AILifeAnalytics.Domain.Entities;
 using AILifeAnalytics.Domain.Interfaces;
+using System.Text.Json;
 
 namespace AILifeAnalytics.Application.Services;
 
@@ -241,6 +242,43 @@ public class PersonalityProfileService
         DayOfWeek.Sunday => "Воскресенье",
         _ => "Неизвестно"
     };
+
+    public static ProfileResponse MapToResponse(PersonalityProfile p) => new()
+    {
+        Id = p.Id,
+        GeneratedAt = p.GeneratedAt,
+        PeriodFrom = p.PeriodFrom,
+        PeriodTo = p.PeriodTo,
+        DaysAnalyzed = p.DaysAnalyzed,
+        ArchetypeName = p.ArchetypeName,
+        ArchetypeEmoji = p.ArchetypeEmoji,
+        ArchetypeDescription = p.ArchetypeDescription,
+        PeakPerformancePattern = p.PeakPerformancePattern,
+        EnergyPattern = p.EnergyPattern,
+        StressPattern = p.StressPattern,
+
+        Superpowers = TryDeserializeList(p.Superpowers),
+        Vulnerabilities = TryDeserializeList(p.Vulnerabilities),
+        Recommendations = TryDeserializeList(p.Recommendations),
+
+        OptimalSleepHours = p.OptimalSleepHours,
+        OptimalWorkHours = p.OptimalWorkHours,
+        MostProductiveDayOfWeek = p.MostProductiveDayOfWeek,
+        CorrelationSleepFocus = p.CorrelationSleepFocus,
+        CorrelationStressMood = p.CorrelationStressMood,
+        ForecastText = p.ForecastText,
+        ForecastRisk = p.ForecastRisk,
+        FullAnalysis = p.FullAnalysis
+    };
+
+    private static List<string> TryDeserializeList(string json)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        }
+        catch { return []; }
+    }
 }
 
 public class ProfileStats

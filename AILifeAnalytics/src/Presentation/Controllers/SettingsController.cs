@@ -1,143 +1,56 @@
-﻿using AILifeAnalytics.Application.DTOs;
-using AILifeAnalytics.Domain.Entities;
-using AILifeAnalytics.Domain.Interfaces;
+﻿using AILifeAnalytics.Application.Commands.Settings;
+using AILifeAnalytics.Application.DTOs;
+using AILifeAnalytics.Application.Queries.Settings;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AILifeAnalytics.Controllers
+namespace AILifeAnalytics.Controllers;
+
+/// <summary>
+/// Настройки AI-провайдеров, API-ключей и HTTP-прокси
+/// </summary>
+[ApiController]
+[Route("api/settings")]
+[Produces("application/json")]
+public class SettingsController : ControllerBase
 {
+    private readonly IMediator _mediator;
 
-    [ApiController]
-    [Route("api/settings")]
-    [Produces("application/json")]
-    public class SettingsController : BaseController
+    public SettingsController(IMediator mediator) => _mediator = mediator;
+
+    /// <summary>
+    /// Список AI-провайдеров: статус ключа, активный + настройки прокси
+    /// </summary>
+    [HttpGet("providers")]
+    public async Task<ActionResult<ApiResponse<SettingsResponse>>> GetProviders()
     {
-        private readonly ISettingsRepository _settingsRepo;
-        private readonly IEnumerable<IAIProvider> _providers;
+        var result = await _mediator.Send(new GetProvidersQuery());
+        return Ok(ApiResponse<SettingsResponse>.Ok(result));
+    }
 
-        public SettingsController(ISettingsRepository settingsRepo, IEnumerable<IAIProvider> providers)
-        {
-            _settingsRepo = settingsRepo;
-            _providers = providers;
-        }
+    /// <summary>
+    /// Сохранить: активный провайдер, API-ключи, прокси
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<bool>>> Save([FromBody] SaveSettingsRequest request)
+    {
+        var result = await _mediator.Send(new SaveSettingsCommand(request));
+        return Ok(ApiResponse<bool>.Ok(result));
+    }
 
-        /// <summary
-        /// >Провайдеры + текущие настройки прокси
-        /// </summary>
-        [HttpGet("providers")]
-        public async Task<ActionResult<ApiResponse<SettingsResponse>>> GetProviders()
-        {
-            var settings = await _settingsRepo.GetAsync();
+    /// <summary>
+    /// Проверить HTTP-прокси
+    /// </summary>
+    [HttpPost("test-proxy")]
+    public async Task<ActionResult<ApiResponse<string>>> TestProxy([FromBody] ProxySettings request)
+    {
+        var result = await _mediator.Send(new TestProxyCommand(
+            request.Host,
+            request.Port,
+            request.Username,
+            request.Password));
 
-            var providers = _providers.Select(p => new ProviderInfo
-            {
-                Name = p.ProviderName,
-                HasKey = settings.ApiKeys.TryGetValue(p.ProviderName, out var key) && !string.IsNullOrWhiteSpace(key),
-                IsActive = settings.ActiveProvider.Equals(p.ProviderName, StringComparison.OrdinalIgnoreCase)
-            });
-
-            var response = new SettingsResponse
-            {
-                Providers = providers,
-                Proxy = new ProxySettingsDto
-                {
-                    Enabled = settings.Proxy.Enabled,
-                    Host = settings.Proxy.Host,
-                    Port = settings.Proxy.Port,
-                    Username = settings.Proxy.Username,
-                    Password = string.IsNullOrEmpty(settings.Proxy.Password) ? "" : "••••••••"
-                }
-            };
-
-            return Ok(ApiResponse<SettingsResponse>.Ok(response));
-        }
-
-        /// <summary>
-        /// Сохранить всё: провайдер, ключи, прокси
-        /// </summary>
-        [HttpPost]
-        public async Task<ActionResult<ApiResponse<bool>>> Save([FromBody] SaveSettingsRequest request)
-        {
-            var knownNames = _providers.Select(p => p.ProviderName).ToHashSet();
-
-            if (!knownNames.Contains(request.ActiveProvider))
-                return BadRequest(ApiResponse<bool>.Fail($"Неизвестный провайдер: {request.ActiveProvider}"));
-
-            var settings = await _settingsRepo.GetAsync();
-            settings.ActiveProvider = request.ActiveProvider;
-
-            foreach (var (provider, key) in request.ApiKeys)
-                if (knownNames.Contains(provider) && !string.IsNullOrWhiteSpace(key))
-                    settings.ApiKeys[provider] = key;
-
-            settings.Proxy.Enabled = request.Proxy.Enabled;
-            settings.Proxy.Host = request.Proxy.Host;
-            settings.Proxy.Port = request.Proxy.Port;
-            settings.Proxy.Username = request.Proxy.Username;
-
-            if (!string.IsNullOrWhiteSpace(request.Proxy.Password) && request.Proxy.Password != "••••••••")
-            {
-                settings.Proxy.Password = request.Proxy.Password;
-            }
-
-            await _settingsRepo.SaveAsync(settings);
-            return Ok(ApiResponse<bool>.Ok(true));
-        }
-
-        /// <summary>Проверить соединение через текущий прокси</summary>
-        [HttpPost("test-proxy")]
-        public async Task<ActionResult<ApiResponse<string>>> TestProxy()
-        {
-            var settings = await _settingsRepo.GetAsync();
-
-            if (!settings.Proxy.Enabled || string.IsNullOrWhiteSpace(settings.Proxy.Host))
-                return Ok(ApiResponse<string>.Ok("ℹ Прокси отключён или хост не задан."));
-
-            try
-            {
-                var webProxy = new System.Net.WebProxy(settings.Proxy.ToUrl(), false);
-
-                if (!string.IsNullOrWhiteSpace(settings.Proxy.Username))
-                    webProxy.Credentials = new System.Net.NetworkCredential(settings.Proxy.Username, settings.Proxy.Password);
-
-                var handler = new HttpClientHandler
-                {
-                    Proxy = webProxy,
-                    UseProxy = true
-                };
-
-                using var client = new HttpClient(handler)
-                {
-                    Timeout = TimeSpan.FromSeconds(10)
-                };
-
-                var resp = await client.GetAsync("https://httpbin.org/ip");
-                var body = await resp.Content.ReadAsStringAsync();
-
-                string ip;
-                try
-                {
-                    using var doc = System.Text.Json.JsonDocument.Parse(body);
-                    ip = doc.RootElement.GetProperty("origin").GetString() ?? body;
-                }
-                catch
-                {
-                    ip = body.Trim();
-                }
-
-                return Ok(ApiResponse<string>.Ok($"✓ Прокси работает. Внешний IP: {ip}"));
-            }
-            catch (TaskCanceledException)
-            {
-                return Ok(ApiResponse<string>.Ok("✗ Тайм-аут (10 сек). Прокси не отвечает."));
-            }
-            catch (HttpRequestException ex)
-            {
-                return Ok(ApiResponse<string>.Ok($"✗ Ошибка соединения: {ex.Message}"));
-            }
-            catch (Exception ex)
-            {
-                return Ok(ApiResponse<string>.Ok($"✗ Неожиданная ошибка: {ex.Message}"));
-            }
-        }
+        bool isSuccess = result.StartsWith("Прокси работает");
+        return isSuccess ? Ok(ApiResponse<string>.Ok(result)) : Ok(ApiResponse<string>.Fail(result));
     }
 }

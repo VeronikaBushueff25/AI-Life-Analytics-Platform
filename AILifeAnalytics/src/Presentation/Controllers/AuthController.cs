@@ -1,28 +1,32 @@
-﻿using AILifeAnalytics.Application.DTOs;
-using AILifeAnalytics.Domain.Interfaces;
+﻿using AILifeAnalytics.Application.Commands.Auth;
+using AILifeAnalytics.Application.DTOs;
+using AILifeAnalytics.Application.Queries.Auth;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace AILifeAnalytics.Controllers;
 
+/// <summary>
+/// Аутентификация: регистрация, вход, данные текущего пользователя 
+/// </summary>
 [ApiController]
 [Route("api/auth")]
 [Produces("application/json")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _auth;
+    private readonly IMediator _mediator;
 
-    public AuthController(IAuthService auth) => _auth = auth;
+    public AuthController(IMediator mediator) => _mediator = mediator;
 
     /// <summary>
     /// Регистрация нового пользователя
     /// </summary>
     [HttpPost("register")]
-    public async Task<ActionResult<ApiResponse<object>>> Register(
-        [FromBody] RegisterRequest req)
+    public async Task<ActionResult<ApiResponse<object>>> Register([FromBody] RegisterRequest req)
     {
-        var result = await _auth.RegisterAsync(req.Email, req.Password, req.Name);
+        var result = await _mediator.Send(new RegisterCommand(req.Email, req.Password, req.Name));
 
         if (!result.Success)
             return BadRequest(ApiResponse<object>.Fail(result.Error!));
@@ -35,12 +39,12 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Вход в систему
+    /// Вход
     /// </summary>
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse<object>>> Login([FromBody] LoginRequest req)
     {
-        var result = await _auth.LoginAsync(req.Email, req.Password);
+        var result = await _mediator.Send(new LoginCommand(req.Email, req.Password));
 
         if (!result.Success)
             return Unauthorized(ApiResponse<object>.Fail(result.Error!));
@@ -53,21 +57,18 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Получить данные текущего пользователя
+    /// Данные текущего авторизованного пользователя
     /// </summary>
-    [HttpGet("me")]
     [Authorize]
+    [HttpGet("me")]
     public async Task<ActionResult<ApiResponse<object>>> Me()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId is null) return Unauthorized();
-
-        return Ok(ApiResponse<object>.Ok(new
-        {
-            id = userId,
-            email = User.FindFirstValue(ClaimTypes.Email),
-            name = User.FindFirstValue(ClaimTypes.Name),
-            role = User.FindFirstValue(ClaimTypes.Role)
-        }));
+        var result = await _mediator.Send(new GetCurrentUserQuery(
+            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+            User.FindFirstValue(ClaimTypes.Email) ?? "",
+            User.FindFirstValue(ClaimTypes.Name) ?? "",
+            User.FindFirstValue(ClaimTypes.Role) ?? ""
+        ));
+        return Ok(ApiResponse<object>.Ok(result));
     }
 }
