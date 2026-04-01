@@ -61,13 +61,17 @@ async function submitEntry(e) {
         notes: document.getElementById('f-notes').value
     };
 
-    const { ok, error } = await ActivityApi.create(payload);
+    const { ok, data, error } = await ActivityApi.create(payload);
 
     btn.disabled = false;
     btn.textContent = 'Сохранить запись';
 
     if (ok) {
-        toast('Запись сохранена! 🎉', 'success');
+        if (data?.newAchievements?.length > 0) {
+            showAchievementToast(data.newAchievements);
+        } else {
+            toast('Запись сохранена! 🎉', 'success');
+        }
         document.getElementById('f-notes').value = '';
         navigate('dashboard');
     } else {

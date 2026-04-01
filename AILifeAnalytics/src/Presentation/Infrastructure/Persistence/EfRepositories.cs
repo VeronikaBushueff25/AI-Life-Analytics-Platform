@@ -1,4 +1,5 @@
 ﻿using AILifeAnalytics.Domain.Entities;
+using AILifeAnalytics.Domain.Enums;
 using AILifeAnalytics.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -223,4 +224,33 @@ public class EfCbtRepository : ICbtRepository
         }
         return stats;
     }
+}
+
+public class EfAchievementRepository : IAchievementRepository
+{
+    private readonly AppDbContext _db;
+    public EfAchievementRepository(AppDbContext db) => _db = db;
+
+    public async Task<Achievement> CreateAsync(Achievement achievement)
+    {
+        _db.Achievements.Add(achievement);
+        await _db.SaveChangesAsync();
+        return achievement;
+    }
+
+    public async Task<IEnumerable<Achievement>> GetByUserAsync(Guid userId) =>
+        await _db.Achievements.Where(a => a.UserId == userId).OrderByDescending(a => a.UnlockedAt).ToListAsync();
+
+    public async Task<bool> HasAsync(Guid userId, AchievementType type) =>
+        await _db.Achievements.AnyAsync(a => a.UserId == userId && a.Type == type);
+
+    public async Task MarkAllSeenAsync(Guid userId)
+    {
+        var unseen = await _db.Achievements.Where(a => a.UserId == userId && a.IsNew).ToListAsync();
+        unseen.ForEach(a => a.IsNew = false);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task<int> GetUnseenCountAsync(Guid userId) =>
+        await _db.Achievements.CountAsync(a => a.UserId == userId && a.IsNew);
 }

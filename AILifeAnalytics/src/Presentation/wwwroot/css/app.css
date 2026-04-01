@@ -2907,6 +2907,329 @@ code {
     color: var(--text3);
 }
 
+/* Achievements  */
+
+/* Sidebar badge */
+.nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Прогресс */
+.achievements-progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 28px;
+}
+
+.ap-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ap-label {
+    font-size: 14px;
+    color: var(--text2);
+}
+
+.ap-value {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.ap-bar-wrap {
+    height: 8px;
+    background: var(--surface3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.ap-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #9183ff);
+    border-radius: 4px;
+    transition: width .6s ease;
+}
+
+.ap-counts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text3);
+}
+
+/* Секции */
+.achievements-section {
+    margin-bottom: 32px;
+}
+
+.achievements-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+}
+
+.section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.new-dot {
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+}
+
+.unlocked-dot {
+    background: var(--green);
+}
+
+.locked-dot {
+    background: var(--text3);
+}
+
+/* Сетка */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+/* Карточка достижения */
+.achievement-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+    .achievement-card.unlocked {
+        border-color: rgba(124, 111, 255, 0.2);
+    }
+
+        .achievement-card.unlocked:hover {
+            transform: translateY(-3px);
+            border-color: rgba(124, 111, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(124, 111, 255, 0.1);
+        }
+
+    .achievement-card.is-new {
+        border-color: rgba(124, 111, 255, 0.5);
+        background: linear-gradient( 135deg, var(--surface) 0%, rgba(124, 111, 255, 0.06) 100% );
+        animation: newPulse 2s ease-in-out 3;
+    }
+
+@keyframes newPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(124, 111, 255, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(124, 111, 255, 0.15);
+    }
+}
+
+.achievement-card.locked {
+    opacity: 0.45;
+    filter: grayscale(1);
+    cursor: default;
+}
+
+.ach-emoji {
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.locked-emoji {
+    filter: grayscale(1);
+    opacity: 0.4;
+}
+
+.ach-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.locked-title {
+    color: var(--text3);
+}
+
+.ach-desc {
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.5;
+}
+
+.ach-context {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.ach-date {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 4px;
+}
+
+.ach-lock {
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+.ach-new-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* Popup достижения */
+.achievement-popup {
+    position: fixed;
+    bottom: 80px;
+    right: 24px;
+    z-index: 2000;
+    animation: popupIn .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+    .achievement-popup.hiding {
+        animation: popupOut .4s ease forwards;
+    }
+
+@keyframes popupIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: none scale(1);
+    }
+}
+
+@keyframes popupOut {
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+.achievement-popup-inner {
+    background: var(--surface);
+    border: 1px solid rgba(124, 111, 255, 0.4);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    text-align: center;
+    min-width: 220px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.popup-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.popup-emoji {
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.popup-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.popup-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+}
+
+/* Confetti */
+.confetti-piece {
+    position: fixed;
+    top: -10px;
+    pointer-events: none;
+    z-index: 3000;
+    animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .achievements-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .achievement-popup {
+        right: 12px;
+        left: 12px;
+        bottom: 60px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .cbt-stats-row {
@@ -2930,6 +3253,8 @@ code {
     .cbt-stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
+
+
 }
 
 /* Responsive */

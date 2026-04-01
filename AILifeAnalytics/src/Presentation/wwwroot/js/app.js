@@ -10,6 +10,7 @@ const pageInitializers = {
     entry: () => setupEntryForm(),
     profile: () => loadProfile(),
     cbt: () => loadCbt(),
+    achievements: () => loadAchievements(),
 };
 
 const THEMES = [
@@ -132,6 +133,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/pages/login.html');
     const html = await res.text();
     document.getElementById('auth-overlay').innerHTML = html;
-
     await checkAuth();
+    await updateAchievementsBadge();
 });
+
+// Показать счётчик новых достижений в sidebar
+async function updateAchievementsBadge() {
+    const { ok, data } = await AchievementsApi.getAll();
+    if (!ok || !data) return;
+
+    const badge = document.getElementById('achievements-badge');
+    if (!badge) return;
+
+    if (data.unseenCount > 0) {
+        badge.textContent = data.unseenCount;
+        badge.style.display = 'block';
+    } else {
+        badge.style.display = 'none';
+    }
+}

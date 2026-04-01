@@ -56,6 +56,7 @@ public class CbtRecord
     public string Insight { get; set; } = string.Empty; // что понял
     public bool IsCompleted { get; set; } = false;
     public string AiSummary { get; set; } = string.Empty; // итоговый AI-комментарий
+    public int EmotionShift => EmotionIntensity - NewEmotionIntensity;
 
     /// <summary>
     /// Navigation

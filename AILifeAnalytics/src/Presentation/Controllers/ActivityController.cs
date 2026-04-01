@@ -35,18 +35,23 @@ public class ActivityController : ControllerBase
     /// Создать новую дневную запись (одна запись на дату)
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<ActivityResponse>>> Create([FromBody] CreateActivityRequest request)
+    public async Task<ActionResult<ApiResponse<object>>> Create([FromBody] CreateActivityRequest request)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ApiResponse<ActivityResponse>.Fail(string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))));
+            return BadRequest(ApiResponse<object>.Fail(string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))));
         try
         {
             var result = await _mediator.Send(new CreateActivityCommand(UserId, request));
-            return CreatedAtAction(nameof(GetAll), ApiResponse<ActivityResponse>.Ok(result));
+
+            return CreatedAtAction(nameof(GetAll), ApiResponse<object>.Ok(new
+            {
+                activity = result.Activity,
+                newAchievements = result.NewAchievements
+            }));
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(ApiResponse<ActivityResponse>.Fail(ex.Message));
+            return Conflict(ApiResponse<object>.Fail(ex.Message));
         }
     }
 

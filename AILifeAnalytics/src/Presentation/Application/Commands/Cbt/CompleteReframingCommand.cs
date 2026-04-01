@@ -15,12 +15,19 @@ public record CompleteReframingCommand(Guid RecordId, Guid UserId, CompleteRefra
 public class CompleteReframingHandler : IRequestHandler<CompleteReframingCommand, CbtRecordResponse>
 {
     private readonly CbtService _cbtService;
-
-    public CompleteReframingHandler(CbtService cbtService) => _cbtService = cbtService;
+    private readonly AchievementService _achievementService;
+    public CompleteReframingHandler(CbtService cbtService, AchievementService achievementService)
+    {
+        _cbtService = cbtService;
+        _achievementService = achievementService;
+    }
+        
 
     public async Task<CbtRecordResponse> Handle(CompleteReframingCommand command, CancellationToken cancellationToken)
     {
         var record = await _cbtService.CompleteReframingAsync(command.RecordId, command.UserId, command.Request);
+        await _achievementService.CheckAfterCbtAsync(command.UserId, record.IsCompleted, record.EmotionShift);
+
         return CbtService.MapToResponse(record);
     }
 }

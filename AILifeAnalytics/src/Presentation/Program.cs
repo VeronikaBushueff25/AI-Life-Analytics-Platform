@@ -86,6 +86,9 @@ builder.Services.AddScoped<PersonalityProfileService>();
 builder.Services.AddScoped<ICbtRepository, EfCbtRepository>();
 builder.Services.AddScoped<CbtService>();
 
+builder.Services.AddScoped<IAchievementRepository, EfAchievementRepository>();
+builder.Services.AddScoped<AchievementService>();
+
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p =>
         p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));

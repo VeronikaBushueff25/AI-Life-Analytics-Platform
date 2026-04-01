@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<UserSettings> UserSettings { get; set; }
     public DbSet<PersonalityProfile> PersonalityProfiles { get; set; }
     public DbSet<CbtRecord> CbtRecords { get; set; }
+    public DbSet<Achievement> Achievements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -95,6 +96,20 @@ public class AppDbContext : DbContext
             e.Property(x => x.AutomaticThought).HasMaxLength(500);
             e.Property(x => x.AiChallenge).HasMaxLength(2000);
             e.Property(x => x.AiSummary).HasMaxLength(2000);
+        });
+
+        mb.Entity<Achievement>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.UserId, x.Type });
+            e.HasOne(x => x.User)
+             .WithMany()
+             .HasForeignKey(x => x.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.Type)
+             .HasConversion<string>()
+             .HasMaxLength(50);
+            e.Property(x => x.Context).HasMaxLength(200);
         });
     }
 }

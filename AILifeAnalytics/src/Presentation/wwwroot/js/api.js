@@ -80,3 +80,7 @@ const CbtApi = {
     delete: (id) => apiFetch(`/cbt/${id}`, { method: 'DELETE' }),
     getStats: () => apiFetch('/cbt/stats'),
 };
+
+const AchievementsApi = {
+    getAll: () => apiFetch('/achievements'),
+};

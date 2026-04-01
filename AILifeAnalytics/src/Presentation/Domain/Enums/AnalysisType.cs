@@ -5,6 +5,7 @@
         General = 0,
         Patterns = 1,
         Weekly = 2,
-        BurnoutAlert = 3
+        BurnoutAlert = 3,
+        Daily = 4
     }
 }

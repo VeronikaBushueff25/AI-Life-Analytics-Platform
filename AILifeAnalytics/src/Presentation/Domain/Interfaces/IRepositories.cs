@@ -1,4 +1,5 @@
 using AILifeAnalytics.Domain.Entities;
+using AILifeAnalytics.Domain.Enums;
 using System.Runtime;
 
 namespace AILifeAnalytics.Domain.Interfaces;
@@ -147,4 +148,13 @@ public interface ICbtRepository
 
     // Аналитика
     Task<Dictionary<string, int>> GetDistortionStatsAsync(Guid userId);
+}
+
+public interface IAchievementRepository
+{
+    Task<Achievement> CreateAsync(Achievement achievement);
+    Task<IEnumerable<Achievement>> GetByUserAsync(Guid userId);
+    Task<bool> HasAsync(Guid userId, AchievementType type);
+    Task MarkAllSeenAsync(Guid userId);
+    Task<int> GetUnseenCountAsync(Guid userId);
 }

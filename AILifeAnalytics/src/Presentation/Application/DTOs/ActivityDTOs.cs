@@ -238,3 +238,33 @@ public class CbtStatsResponse
     public int TopDistortionCount { get; set; }
     public Dictionary<string, int> DistortionStats { get; set; } = new();
 }
+
+public class AchievementResponse
+{
+    public Guid Id { get; set; }
+    public string Type { get; set; } = string.Empty;
+    public string Emoji { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Context { get; set; } = string.Empty;
+    public DateTime UnlockedAt { get; set; }
+    public bool IsNew { get; set; }
+}
+
+public class AchievementsPageResponse
+{
+    public IEnumerable<AchievementResponse> Unlocked { get; set; } = [];
+    public IEnumerable<LockedAchievement> Locked { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int UnlockedCount { get; set; }
+    public int UnseenCount { get; set; }
+    public double Progress { get; set; } // %
+}
+
+public class LockedAchievement
+{
+    public string Type { get; set; } = string.Empty;
+    public string Emoji { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+}
